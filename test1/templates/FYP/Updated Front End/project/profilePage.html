@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="profilePage.css">
+
+    <title>Profile Page</title>
+</head>
+<body>
+
+
+  <!---Navigationbar-->
+
+    <nav class="navbar bg-dark gradient navbar-expand-lg navbar-dark shadow-lg">
+        
+        <div class="container">
+            <a href="#" class="navbar-brand">Neurosky</a>
+          <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#nm">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          
+
+          <div class="collapse navbar-collapse ms-auto" id="nm" >
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a href="homePage.html" class="nav-link contr1 text-light" id="Home">Home</a>
+            </li>
+            <li class="nav-item">
+              <a href="signInPage.html" class="nav-link contr1 text-light" id="Login">Logout</a>
+            </li>
+
+            </li>
+          </ul>
+        </div>
+
+        </div>
+
+
+
+        
+
+    </nav>
+
+  <!---First container for all the information-->
+
+
+<div class="container mb-4 mt-4 ">
+
+  <!--- first row for profile summary, learning method summary and pie chart graph --->
+  
+  <div class="row">
+
+      <!---first column for profile summary-->
+
+      <div class="col-md-4 border border-end-0 rounded shadow">
+       
+   
+
+
+      <div class="card border-0 bg-transparent">
+        <div class="card-body" style="text-align: center;">
+          <h5 class="card-title" >Profile Summary<hr></h5>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item mb-2" id="userName" >Username : user1</li>
+            <li class="list-group-item mb-2" id="idealStudyTime" >Ideal Study Time: 03:00 PM</li>
+            <li class="list-group-item mb-2" >Hihest Consecutive Attention :</li>
+            
+            <li class="list-group-item mb-2" >
+            <div class="mt-2">
+
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item mb-2 text-primary" id="consecutiveHighAttentionAV">Aural/Visual :</li>
+                <li class="list-group-item mb-2 text-danger" id="consecutiveHighAttentionRW">Read/Write :</li>
+
+
+                
+              </ul>
+
+            </div>
+            
+            
+            </li>
+
+            
+            
+          </ul>
+        </div>
+      </div>
+  
+
+  
+       
+      
+  
+
+
+
+
+
+      </div>
+
+        <!---Second column for learning method summary-->
+
+
+        <div class="col-md-4 border border-start-0 shadow rounded">
+
+          <div class="card border-0 bg-transparent">
+            <div class="card-body" style="text-align: center;">
+              <h5 class="card-title" >Learning Method Summary<hr></h5>
+            
+              <ul class="list-group list-group-flush">
+
+                <li class="list-group-item mb-2" >Sessions Completed :</li>
+                
+                <li class="list-group-item mb-2" >
+                <div class="mt-2">
+    
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item mb-2 text-danger" id="sessionsCompletedAV">Aural/Visual :</li>
+                    <li class="list-group-item mb-2 text-primary" id="sessionsCompletedRW">Read/Write :</li>
+    
+    
+                    
+                  </ul>
+    
+                </div>
+                
+                
+                </li>
+                
+                <li class="list-group-item mb-2" >High to Total Attention Percentage :</li>
+                
+                <li class="list-group-item mb-2" >
+                <div class="mt-2">
+    
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item mb-2 text-danger" id="highToTotalAV">Aural/Visual :</li>
+                    <li class="list-group-item mb-2 text-primary" id="highToTotalRW">read/Write:</li>
+    
+    
+                    
+                  </ul>
+    
+                </div>
+                
+                
+                </li>
+    
+                
+                
+              </ul>
+            </div>
+          </div>
+          
+
+
+        </div>
+        
+          <!---third column for pie chart graph-->
+
+
+        <div class="col-md-4 border rounded shadow">
+
+        
+
+        <h5 class="pt-3" style="text-align: center;">Total Attention High/Total</h5>
+
+        <canvas id="pieChart1"></canvas>
+
+      
+      </div>
+
+
+       
+ 
+
+      
+  </div>
+
+
+  <!---second row for title and date selection of bottom graphs-->
+
+<div class="row justify-content-center mt-4">
+  
+  <div class="col-12 border shadow rounded">
+    
+    <h5 style="text-align: center;" class="mt-3">
+      Attention Level Summary
+    </h5>
+
+    <div>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text">Enter Desired Date for Summary</span>
+        </div>
+        <input type="date" class="form-control" aria-label="Date" placeholder="Enter date in the formal dd-mm-yyyy" id="dateSelected1">
+        <button class="btn btn-primary btn-md" onclick="updateData()">Submit</button>
+      </div>
+
+
+    </div>
+
+
+
+  </div>
+
+
+</div>
+
+
+  <!---third row for bottom graphs-->
+
+
+<div class="row justify-content-center mt-2" >
+  
+  <div class="col-12 border shadow rounded h-100">
+
+    <div class="row">
+
+    <div class="col-md-4 rounded shadow border-0 ">
+       
+   
+
+
+      <div class="card border-0 bg-transparent h-100">
+        <div class="card-body border-0" style="height: 400px;text-align: center;">
+          <h5 class="card-title" >Daily Sessions<hr></h5>
+          <div class="d-flex justify-content-center align-items-center" style="height: 350px;text-align: center;">
+            <div class="h-100"><canvas id="dailySessionsChart" class="bg-dark rounded h-99"></canvas></div>
+            </div>
+  
+         
+      
+      
+        </div>
+       </div>
+   </div>
+
+   <div class="col-md-4 rounded shadow border-0 h-100">
+       
+   
+
+
+    <div class="card border-0 bg-transparent">
+      <div class="card-body border-0 h-100" style="text-align: center;">
+        <h5 class="card-title" >Daily<hr></h5>
+        <div class="d-flex justify-content-center align-items-center" style="height: 350px;text-align: center;">
+          <div class="h-100"><canvas id="dailyChart" class="bg-dark rounded h-99"></canvas></div>
+          </div>
+
+       
+    
+    
+      </div>
+     </div>
+ </div>
+
+
+ <div class="col-md-4 rounded shadow border-0 h-100">
+       
+   
+
+
+  <div class="card border-0 bg-transparent h-100">
+    <div class="card-body border-0" style="text-align: center;">
+      <h5 class="card-title" >Weekly<hr></h5>
+      <div class="d-flex justify-content-center align-items-center" style="height: 350px;text-align: center;"> 
+        <div class="h-100"><canvas id="weeklyChart" class="bg-dark rounded h-99"></canvas></div>
+        </div>
+
+     
+  
+  
+    </div>
+   </div>
+</div>
+
+  
+  
+  
+  
+  </div>
+
+</div>
+</div>  
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>//not sure if needed
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    <script src="profilePage.js"></script>
+
+</body>
+
+</html>
+

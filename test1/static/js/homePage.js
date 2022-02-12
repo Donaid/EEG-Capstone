@@ -1,10 +1,16 @@
+var socket = new WebSocket('ws://localhost:8000/ws/test1')
+
 //  --------------------------------  Music PLayer -----------------------------------------------
 
 const nextBtn = document.getElementById('nextButton');
 const prevBtn = document.getElementById('prevButton');
 const playPauseBtn = document.getElementById('playPauseButton');
 const music = document.getElementById('musicPlayer');
+const alert1 = document.getElementById('alert');
 let musicPlaying = false;
+
+
+music.addEventListener('ended',nextSong)
 
 const musicList = ['song1','song2','song3'];
 let songNumber=0;
@@ -20,6 +26,7 @@ function playPauseSong(){
     music.play();
     playPauseBtn.getElementsByClassName('fas')[0].classList.add('fa-pause');
     playPauseBtn.getElementsByClassName('fas')[0].classList.remove('fa-play');
+    music.volume=0.5
     musicPlaying=true;
 
   }
@@ -51,7 +58,7 @@ function prevSong(){
   else{
     songNumber--
   }
-  music.src='media/'+musicList[songNumber]+'.mp3';
+  music.src='static/media/'+musicList[songNumber]+'.mp3';
 
   if(musicPlaying){
     music.play();
@@ -64,10 +71,10 @@ function prevSong(){
 //  -----------------------------------  Main Graph  -------------------------------------------------
 
 const ctx = document.getElementById('myChart').getContext('2d');
-const myChart = new Chart(ctx, {
+const dataObj = {
     type: 'line',
     data: {
-        labels: ['10s', '10s', '10s', '10s', '10s', '10s'],
+        labels: ['15s','15s','15s','15s','15s','15s'],
         datasets: [{
             label: 'Attention Graph',
             data: [0,0,0,0,0,0],
@@ -109,7 +116,9 @@ const myChart = new Chart(ctx, {
         }
 
     }
-});
+}
+
+const myChart = new Chart(ctx, dataObj);
 
 //------------------------------------Updating Graph-------------------------------------------------
 
@@ -231,14 +240,15 @@ function unDisableButtons(){
 function updateChart(){
 
   /*Fetch attentionValue here*/
-
-  myChart.data.datasets[0].data.shift();
-  attentionValue=Math.random()*100 //using random value for now, delete this line later and use actual value
-  myChart.data.datasets[0].data.push(attentionValue);
-  myChart.update();
-  counter++
-  totalAttentionTemp=totalAttentionTemp+attentionValue
-
+	socket.onmessage = function(e){
+		var djangoData = JSON.parse(e.data);
+		console.log(djangoData);
+		
+		dataObj.data.datasets[0].data.shift();
+		dataObj.data.datasets[0].data.push(djangoData.Attention);
+		myChart.update();
+		
+	}
   }
   
  function calculateAveAttention(attention,number){
@@ -303,4 +313,21 @@ function learningModeReadWrite(){
 
   function closeModal(){
     myModal.hide()
+  }
+
+  function reduceVolume(){
+    if(playPauseBtn.volume>=0.1){
+      music.volume=playPauseBtn.volume-0.1
+    }
+  }
+
+  function increaseVolume(){
+    if(playPauseBtn.volume<1){
+      music.volume=playPauseBtn.volume+0.1
+    }
+  }
+
+
+  function playAlert(){
+    alert1.play()
   }

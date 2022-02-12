@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from django.urls import path
-from .consumers import GraphConsumer
 from .consumers import test2
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
+
 #create routing to channel
-ws_urlpatterns = [
-    path('ws/mysitedddd/', test2.as_asgi())
+websocket_urlPattern = [
+    path('ws/test1', test2.as_asgi()),
 ]
+
+application=ProtocolTypeRouter({
+    'websocket':AuthMiddlewareStack(URLRouter(websocket_urlPattern))
+})

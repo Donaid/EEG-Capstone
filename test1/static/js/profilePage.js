@@ -41,26 +41,44 @@ const hLChart = new Chart(ctx, {
 const userName=document.getElementById('userName');
 const idealStudyTime=document.getElementById('idealStudyTime');
 const audioVideoHighAttention=document.getElementById('consecutiveHighAttentionAV');
-const readWriteHighAttention=document.getElementById('consecutiveLowAttentionRW');
+const readWriteHighAttention=document.getElementById('consecutiveHighAttentionRW');
 
-const sessionsCompletedAV=document.getElementById('sessionsCompletedAV')
-const sessionsCompletedRW=document.getElementById('sessionsCompletedRW')
-const highToTotalAV=document.getElementById('highToTotalAV')
-const highToTotalRW=document.getElementById('highToTotalRW')
+const sessionsCompletedAV=document.getElementById('sessionsCompletedAV');
+const sessionsCompletedRW=document.getElementById('sessionsCompletedRW');
+const highToTotalAV=document.getElementById('highToTotalAV');
+const highToTotalRW=document.getElementById('highToTotalRW');
+
+
+var person2 = JSON.parse("{{ personJson|escapejs }}");
+
+value1 = parseInt(person2['userName']);
+value2 = parseInt(person2['idealStudyTime']);
+value3 = parseInt(person2['audioVideoHighAttention']);
+value4 = parseInt(person2['readWriteHighAttention']);
+value5 = parseInt(person2['sessionsCompletedAV']);
+value6 = parseInt(person2['sessionsCompletedRW']);
+value7 = parseInt(person2['highToTotalAV']);
+value8 = parseInt(person2['highToTotalRW']);
+value9 = parseInt(person2['graphHighAttention']);
+value10 = parseInt(person2['graphLowAttention']);
 
 let userData={
- userName:'',
-idealStudyTime:'',
-audioVideoHighAttention:'',
-readWriteHighAttention:'',
+userName:value1,
+idealStudyTime:value2,
+audioVideoHighAttention:value3,
+readWriteHighAttention:value4,
 
-sessionsCompletedAV:'',
-sessionsCompletedRW:'',
-highToTotalAV:'',
-highToTotalRW:'',
-graphHighAttention:0,
-graphLowAttention:0,
+sessionsCompletedAV:value5,
+sessionsCompletedRW:value6,
+highToTotalAV:value7,
+highToTotalRW:value8,
+graphHighAttention:value9,
+graphLowAttention:value10
 }
+
+
+
+
 
 //fill up userData object using back-end
 
@@ -72,21 +90,22 @@ function updateChart(){
     hLChart.data.datasets[0].data[1]=userData.graphLowAttention;
     hLChart.update();
 
-}
+};
 
 
 //this function will update the profile summary and learning summray using the userData object
 
 function updateData(){
-    userName.innerHTML='Username : ' + userData.userName;
-    idealStudyTime.innerHTML='Ideal Study Time : ' + userData.idealStudyTime;
-    audioVideoHighAttention.innerHTML='Aural/Visual : ' + userData.audioVideoHighAttention
-    readWriteHighAttention.innerHTML='Read/Write : ' + userData.readWriteHighAttention
 
-    sessionsCompletedAV.innerHTML='Aural/Visual : ' + userData.sessionsCompletedAV
-    sessionsCompletedRW.innerHTML='Read/Write : ' + userData.sessionsCompletedRW
-    highToTotalAV.innerHTML='Aural/Visual : ' + userData.highToTotalAV
-    highToTotalRW.innerHTML='Read/Write : ' + userData.highToTotalRW
+  userName.innerHTML='Username : ' + userData.userName;
+  idealStudyTime.innerHTML='Ideal Study Time : ' + userData.idealStudyTime;
+  audioVideoHighAttention.innerHTML='Aural/Visual : ' + userData.audioVideoHighAttention
+  readWriteHighAttention.innerHTML='Read/Write : ' + userData.readWriteHighAttention
+
+  sessionsCompletedAV.innerHTML='Aural/Visual : ' + userData.sessionsCompletedAV
+  sessionsCompletedRW.innerHTML='Read/Write : ' + userData.sessionsCompletedRW
+  highToTotalAV.innerHTML='Aural/Visual : ' + userData.highToTotalAV
+  highToTotalRW.innerHTML='Read/Write : ' + userData.highToTotalRW
 };
 
 
@@ -97,7 +116,7 @@ const ctx2 = document.getElementById('dailySessionsChart').getContext('2d');
 var dSChart = new Chart(ctx2, {
     type: 'bar',
     data: {
-        labels: [["session 1",'0900-1000'], ["session 2",'0900-1000'], ["session 3",'0900-1000'], ["session 4",'0900-1000']],
+        labels: [["session 1"], ["session 2"], ["session 3"], ["session 4"]],
         datasets: [{
             label:[''],
             data: [12, 19, 3, 5],
@@ -132,15 +151,6 @@ var dSChart = new Chart(ctx2, {
   
      
   },
-     plugins: [{
-    beforeInit: function (chart) {
-      chart.data.labels.forEach(function (e, i, a) {
-        if (/\n/.test(e)) {
-          a[i] = e.split(/\n/)
-        }
-      })
-    }
-  }]
 });
 
 //----------------------Daily Chart---------------------------------------------
@@ -184,15 +194,6 @@ var dChart = new Chart(ctx3, {
   
      
   },
-     plugins: [{
-    beforeInit: function (chart) {
-      chart.data.labels.forEach(function (e, i, a) {
-        if (/\n/.test(e)) {
-          a[i] = e.split(/\n/)
-        }
-      })
-    }
-  }]
 });
 
 //----------------------Weekly Chart---------------------------------------------
@@ -234,27 +235,21 @@ var wChart = new Chart(ctx4, {
   
      
   },
-     plugins: [{
-    beforeInit: function (chart) {
-      chart.data.labels.forEach(function (e, i, a) {
-        if (/\n/.test(e)) {
-          a[i] = e.split(/\n/)
-        }
-      })
-    }
-  }]
 });
 
 //----------------------Updating the Bottom 3 Graphs---------------------------------------------
 
-const date1=document.getElementById('dateSelected1')
+const date1=document.getElementById('dateSelected1');
+var errorModal = new bootstrap.Modal(document.getElementById("errorModal"), {});
+
+
+
 
 //fill this object using date1 with userData
 let graphData1={
-  dailySessionTiming:[['session 1','09-12'],['session 2','12-01'],['session 3','09-12']],//in this array fill up the attention value and the time of the session
-  dailySessionData:[30,40,50],
-  daily:[12,12,4,5],//the attention values for the overall day
-  weekly:[1,1,4,5]//the attention values for the overall week
+  dailySessionData:[50,50,50,50,50],//the attention values for daily sessions
+  daily:[10,10,20,20],//the attention values for the overall day
+  weekly:[10,10,20,20]//the attention values for the overall week
 
 }
 
@@ -263,10 +258,13 @@ let graphData1={
 
 
 function fillDailySessionsGraph(){//fills daily sessions graph
-  dSChart.data.labels=graphData1.dailySessionTiming;
+  chartLabelsTemp=[]
+  
   dSChart.data.datasets[0].backgroundColor=[]
   dSChart.data.datasets[0].data=[]
   for(i=0;i<graphData1.dailySessionData.length;i++){
+
+   chartLabelsTemp.push('session ' + (i+1));
     
    dSChart.data.datasets[0].data.push(graphData1.dailySessionData[i])
     
@@ -283,6 +281,7 @@ function fillDailySessionsGraph(){//fills daily sessions graph
     }
  
   }
+  dSChart.data.labels=chartLabelsTemp;
   dSChart.update()
 }
 
@@ -313,10 +312,45 @@ function fillWeeklyGraph(){//fills weekly graph
 
 }
 
-function updateData(){//called when submit button is pressed and calls all the graph functions and fills the graphs
+function updateAll(){//updates all the graphs
   fillDailySessionsGraph()
- 
+  fillDailyGraph()
+  fillWeeklyGraph()
+  updateChart()
+  updateData()
+}
 
+function timer1(){
+  setTimeout(updateAll,500)
+}
+
+
+function changeData(){//this function is for when the user selects Date
+  dateFound = false;
+  date1.value
+
+  if(dateFound){
+
+  
+  //update this object with new date
+  graphData1={
+    dailySessionData:[10,10,10,10],//the attention values for daily sessions
+    daily:[10,10,10,10],//the attention values for the overall day
+    weekly:[10,10,10,10]//the attention values for the overall week
+  
+  }
+
+  updateAll()
 
 }
 
+else{
+  errorModal.show()
+}
+
+}
+
+
+function closeErrorModal(){
+  errorModal.hide()
+}
