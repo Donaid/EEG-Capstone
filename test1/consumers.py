@@ -9,10 +9,10 @@ class test2(AsyncJsonWebsocketConsumer):
     
     async def connect(self):
         self.groupname = 'dashboard'
-        # await self.channel_layer.group_add(
-        #     self.groupname,
-        #     self.channel_name,
-        # )
+        await self.channel_layer.group_add(
+            self.groupname,
+            self.channel_name,
+        )
         
         await self.accept()
         
