@@ -56,7 +56,7 @@ def main():
         sample = []
         print(f"sample after reset: {(len(sample))}")
 
-        remainingTime = 3
+        remainingTime = 15
         threadTimer = threading.Thread(target=timerThread)
         threadTimer.start()
 

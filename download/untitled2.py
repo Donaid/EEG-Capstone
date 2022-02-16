@@ -13,7 +13,7 @@ ws.connect('ws://localhost:8000/ws/test1')
 
 
 while(True):
-    time.sleep(2)
+    time.sleep(15)
     exec(open("complete 2.py").read())
     
      
