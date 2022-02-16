@@ -1,8 +1,7 @@
 import json
-from random import randint
 
 
-from channels.generic.websocket import WebsocketConsumer
+# from channels.generic.websocket import WebsocketConsumer
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 
@@ -10,10 +9,10 @@ class test2(AsyncJsonWebsocketConsumer):
     
     async def connect(self):
         self.groupname = 'dashboard'
-        await self.channel_layer.group_add(
-            self.groupname,
-            self.channel_name,
-            )
+        # await self.channel_layer.group_add(
+        #     self.groupname,
+        #     self.channel_name,
+        # )
         
         await self.accept()
         
@@ -23,26 +22,28 @@ class test2(AsyncJsonWebsocketConsumer):
                 self.channel_name
             
         )
+        await self.disconnect()
         
         #Receive data from database.
     async def receive(self, text_data):
         
         datapoint = json.loads(text_data)
-        val = datapoint['Attention']
+        valA = datapoint['Attention']
+        valS = datapoint['Status']
         await self.channel_layer.group_send(
-            self.groupname,{
+            self.groupname,
+            {
                 'type' : 'deprocessing',
-                'Attention' : val
-                
+                'Attention' : valA,
+                'Status' : valS
             }
         )
         
         print ('DB>>>>',text_data)
         
-        #pass
 #A channel is used to send messages.
     async def deprocessing(self,event):
-        valOther=event['Attention']
-        
-        await self.send(text_data = json.dumps({'Attention' : valOther}))
+        valAttention = event['Attention']
+        valStatus = event['Status']
+        await self.send(text_data = json.dumps({'Attention' : valAttention, 'Status' : valStatus}))
                         

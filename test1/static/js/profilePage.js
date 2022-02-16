@@ -48,10 +48,9 @@ const sessionsCompletedRW=document.getElementById('sessionsCompletedRW');
 const highToTotalAV=document.getElementById('highToTotalAV');
 const highToTotalRW=document.getElementById('highToTotalRW');
 
-
 var person2 = JSON.parse("{{ personJson|escapejs }}");
 
-value1 = parseInt(person2['userName']);
+value1 = person2['userName'];
 value2 = parseInt(person2['idealStudyTime']);
 value3 = parseInt(person2['audioVideoHighAttention']);
 value4 = parseInt(person2['readWriteHighAttention']);
@@ -67,7 +66,6 @@ userName:value1,
 idealStudyTime:value2,
 audioVideoHighAttention:value3,
 readWriteHighAttention:value4,
-
 sessionsCompletedAV:value5,
 sessionsCompletedRW:value6,
 highToTotalAV:value7,
@@ -75,7 +73,6 @@ highToTotalRW:value8,
 graphHighAttention:value9,
 graphLowAttention:value10
 }
-
 
 
 
@@ -162,12 +159,12 @@ var dChart = new Chart(ctx3, {
     data: {
         labels: ['High Attention', 'Low Attention','High Attention','Low Attention'],
         datasets: [{
-            label:['Aural/Visual'],
+            label:[''],
             data: [12, 19, 3, 5],
             backgroundColor: [
                 'rgba(255,0,0,.5)',
-                'rgba(0,0,255, 0.5)',
                 'rgba(255,0,0,.5)',
+                'rgba(0,0,255, 0.5)',
                 'rgba(0,0,255, 0.5)',
             ],
             borderWidth: 1
@@ -205,12 +202,12 @@ var wChart = new Chart(ctx4, {
     data: {
         labels: ['High Attention', 'Low Attention','High Attention','Low Attention'],
         datasets: [{
-            label:['Aural/Visual'],
+            label:[''],
             data: [12, 19, 3, 5],
             backgroundColor: [
                 'rgba(255,0,0,0.5)',
-                'rgba(0,0,255, 0.5)',
                 'rgba(255,0,0,.5)',
+                'rgba(0,0,255, 0.5)',
                 'rgba(0,0,255, 0.5)',
             ],
             borderWidth: 1
@@ -247,9 +244,10 @@ var errorModal = new bootstrap.Modal(document.getElementById("errorModal"), {});
 
 //fill this object using date1 with userData
 let graphData1={
-  dailySessionData:[50,50,50,50,50],//the attention values for daily sessions
-  daily:[10,10,20,20],//the attention values for the overall day
-  weekly:[10,10,20,20]//the attention values for the overall week
+  learningMode:['r','w','r','r'],
+  dailySessionData:[76,41,89,17],//the attention values for daily sessions
+  daily:[70,30,80,20],//the attention values for the overall day
+  weekly:[15,85,28,72]//the attention values for the overall week
 
 }
 
@@ -270,7 +268,7 @@ function fillDailySessionsGraph(){//fills daily sessions graph
     
     
 
-    if(graphData1.dailySessionData[i]>=50){
+    if(graphData1.learningMode[i]==='r'){
       dSChart.data.datasets[0].backgroundColor.push('rgba(0,0,255,0.5)')
    
 
@@ -313,20 +311,20 @@ function fillWeeklyGraph(){//fills weekly graph
 }
 
 function updateAll(){//updates all the graphs
+  updateData()
   fillDailySessionsGraph()
   fillDailyGraph()
   fillWeeklyGraph()
-  updateChart()
-  updateData()
+ 
 }
 
 function timer1(){
-  setTimeout(updateAll,500)
+  setTimeout(updateAll,1000)
 }
 
 
 function changeData(){//this function is for when the user selects Date
-  dateFound = false;
+  dateFound = true;
   date1.value
 
   if(dateFound){
@@ -334,6 +332,7 @@ function changeData(){//this function is for when the user selects Date
   
   //update this object with new date
   graphData1={
+    learningMode:['r','w','r','w'],
     dailySessionData:[10,10,10,10],//the attention values for daily sessions
     daily:[10,10,10,10],//the attention values for the overall day
     weekly:[10,10,10,10]//the attention values for the overall week
