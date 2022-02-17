@@ -10,6 +10,6 @@ websocket_urlPattern = [
     path('ws/test1', test2.as_asgi()),
 ]
 
-# application=ProtocolTypeRouter({
-#     'websocket':AuthMiddlewareStack(URLRouter(websocket_urlPattern))
-# })
+application=ProtocolTypeRouter({
+    'websocket':AuthMiddlewareStack(URLRouter(websocket_urlPattern))
+})

@@ -75,7 +75,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
 ASGI_APPLICATION = 'mysite.asgi.application'
-
+LOGIN_URL = '/test1/signInPage/'
+LOGIN_REDIRECT_URL = '/test1/signInPage/'
 # Database
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 

@@ -40,41 +40,77 @@ def bandpassfilter(signal):
 def main():
   global status
 
-  data = pd.read_csv('demo.csv')
-  data = data["rawEeg"]
+  try:
+    data = pd.read_csv('demo.csv')
+    data = data["rawEeg"]
 
-  filtered = bandpassfilter(data)
-  data = filtered.reshape(-1)
+    filtered = bandpassfilter(data)
+    data = filtered.reshape(-1)
 
-  freqs, psd = signal.welch(data, fs, nperseg=segment_size,window="hann")
+    freqs, psd = signal.welch(data, fs, nperseg=segment_size,window="hann")
 
-  eeg_band_fft = dict()
-  for band in eeg_bands:
-      freq_ix = np.where((freqs >= eeg_bands[band][0]) &
-                        (freqs <= eeg_bands[band][1]))[0]
-      eeg_band_fft[band] = simps(psd [freq_ix],even = 'avg')
+    eeg_band_fft = dict()
+    for band in eeg_bands:
+        freq_ix = np.where((freqs >= eeg_bands[band][0]) &
+                          (freqs <= eeg_bands[band][1]))[0]
+        eeg_band_fft[band] = simps(psd [freq_ix],even = 'avg')
 
-  data = np.array([eeg_band_fft[band] for band in eeg_bands])
-  data = np.reshape(data, (-1, 4))
-  print("Features (Delta, Theta, Alpha, Beta): ", data, "\n")
+    data = np.array([eeg_band_fft[band] for band in eeg_bands])
+    data = np.reshape(data, (-1, 4))
+    print("Features (Delta, Theta, Alpha, Beta): ", data, "\n")
 
-  ML_model = pickle.load(open('ML_Model_Final_v2.sav', 'rb'))
+    ML_model = pickle.load(open('ML_Model_Final_v2.sav', 'rb'))
 
-  if ML_model.predict(data) == 0:
-      print("Machine Learning Prediction: ",ML_model.predict(data), "\n") ## binary result 0 = attentive , 1 = inattentive
-      print("Subject is attentive")
-  else:
-      print("Machine Learning Prediction: ", ML_model.predict(data), "\n")
-      print("Subject is inattentive")
+    if ML_model.predict(data) == 0:
+        print("Machine Learning Prediction: ",ML_model.predict(data), "\n") ## binary result 0 = attentive , 1 = inattentive
+        print("Subject is attentive")
+    else:
+        print("Machine Learning Prediction: ", ML_model.predict(data), "\n")
+        print("Subject is inattentive")
 
-  probability = (ML_model.predict_proba(data)) ## probability
-  result = probability[0][1]*100
+    probability = (ML_model.predict_proba(data)) ## probability
+    result = probability[0][1]*100
+    # result = 100 - result
+  except pandas.io.common.EmptyDataError:
+    result = result
 
+  # data = pd.read_csv('demo.csv')
+  # data = data["rawEeg"]
+
+  # filtered = bandpassfilter(data)
+  # data = filtered.reshape(-1)
+
+  # freqs, psd = signal.welch(data, fs, nperseg=segment_size,window="hann")
+
+  # eeg_band_fft = dict()
+  # for band in eeg_bands:
+  #     freq_ix = np.where((freqs >= eeg_bands[band][0]) &
+  #                       (freqs <= eeg_bands[band][1]))[0]
+  #     eeg_band_fft[band] = simps(psd [freq_ix],even = 'avg')
+
+  # data = np.array([eeg_band_fft[band] for band in eeg_bands])
+  # data = np.reshape(data, (-1, 4))
+  # print("Features (Delta, Theta, Alpha, Beta): ", data, "\n")
+
+  # ML_model = pickle.load(open('ML_Model_Final_v2.sav', 'rb'))
+
+  # if ML_model.predict(data) == 0:
+  #     print("Machine Learning Prediction: ",ML_model.predict(data), "\n") ## binary result 0 = attentive , 1 = inattentive
+  #     print("Subject is attentive")
+  # else:
+  #     print("Machine Learning Prediction: ", ML_model.predict(data), "\n")
+  #     print("Subject is inattentive")
+
+  # probability = (ML_model.predict_proba(data)) ## probability
+  # result = probability[0][1]*100
+  # result = 100 - result
   with open('status.txt') as f:
     status = f.read()
 
-  time.sleep(2)
+  # ws = websocket.WebSocket()
+  # ws.connect('ws://localhost:8000/ws/test1')
   ws.send(json.dumps({'Attention': result, 'Status':status}))
+  time.sleep(2.7)
   
 
 

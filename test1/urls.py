@@ -9,10 +9,11 @@ urlpatterns = [
     re_path(r'^(?P<user_id>[0-9]+)/$', views.detail, name='detail'),
     path('homePage/', views.homePage, name='homePage'),
     path('signInPage/', views.signInPage, name='signInPage'),
-    path('logout/', views.logout, name='logout'),
-    path('signUpPage', views.signUpPage, name='signUpPage'),
+    path('logout/', views.logout_view, name='logout'),
+    path('signUpPage/', views.signUpPage, name='signUpPage'),
     path('profilePage/', views.profilePage, name='profilePage'),
+    path('saveattention/', views.saveAttention, name='saveAttention'),
+    path('updatelatestsession/', views.updateLatestSession, name='updateLatestSession')
     
-    
-    ]
+]
 

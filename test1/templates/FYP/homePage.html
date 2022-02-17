@@ -19,7 +19,7 @@
     <nav class="navbar bg-dark gradient navbar-expand-lg navbar-dark shadow-lg">
         
         <div class="container">
-            <a href="#" class="navbar-brand">Sada</a>
+            <a href="#" class="navbar-brand">SADA</a>
           <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#nm">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -31,7 +31,7 @@
               <a href="{% url 'profilePage' %}" class="nav-link contr1 btn-outline-secondary rounded text-light" id="profile">Profile</a>
             </li>
             <li class="nav-item">
-              <a href="{% url 'signInPage' %}" class="nav-link contr1 btn-outline-secondary rounded text-light" id="login">Logout</a>
+              <a href="{% url 'logout' %}" class="nav-link contr1 btn-outline-secondary rounded text-light" id="login">Logout</a>
             </li>
 
             </li>
@@ -90,7 +90,7 @@
 
       <div class="adjust">
 
-      <button class="btn contr1 shadow-none" style="border-radius: .5rem;" onclick="changeBluetoothIcon()"><img id="bluetoothIcon" style="width: 30px; height: 30px;" src="https://img.icons8.com/material-rounded/96/000000/bluetooth.png"/></button>
+      <button class="btn contr1 shadow-none" style="border-radius: .5rem; cursor: unset"><img id="bluetoothIcon" style="width: 30px; height: 30px;" src="https://img.icons8.com/material-rounded/96/000000/bluetooth-off.png"/></button>
       <button class="btn shadow-none" style="border-radius: .5rem;" onclick="changeAlertIcon()"><img id="alertIcon" style="width: 30px; height: 30px;" src="https://img.icons8.com/material-rounded/96/000000/bell--v1.png"/></button>
     </div>
 
@@ -119,7 +119,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content" style="border-radius: .5rem; text-align: center;" >
           <div class="modal-header">
-            <h5 class="modal-title" style="margin: 0 auto;">Profile</h5>
+            <h5 class="modal-title" style="margin: 0 auto;">Session Summary</h5>
             <button type="button" class="close btn-primary border-0 rounded" data-dismiss="modal" aria-label="Close" onclick="closeModal()">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -161,7 +161,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <script src="{% static 'js/homePage.js' %}"></script>
 </body>
 </html>

@@ -10,7 +10,7 @@ mwlsl = MindwaveLSL('localhost', 13854)
 mwlsl.setup()
 mwlsl.write('{"enableRawOutput": true, "format": "Json"}')
 
-RECORD_DURATION = 10
+RECORD_DURATION = 2
 FILE_PATH = "./demo_output/"
 remainingTime = 0
 sample = []

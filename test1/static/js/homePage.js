@@ -1,4 +1,19 @@
 var socket = new WebSocket('ws://localhost:8000/ws/test1')
+socket.onmessage = function(e) {
+  let tempDjangoData = JSON.parse(e.data);
+  if(isRecording) {
+    updateChart(tempDjangoData)
+    saveAttention(tempDjangoData)
+  }
+
+  if(tempDjangoData.Status == "disconnected") {
+    bluetoothIcon.src="https://img.icons8.com/material-rounded/96/000000/bluetooth-off.png"
+  }
+  else if (tempDjangoData.Status == "connected") {
+    bluetoothIcon.src="https://img.icons8.com/material-rounded/96/000000/bluetooth.png"
+  }
+
+}
 
 //  --------------------------------  Music PLayer -----------------------------------------------
 
@@ -42,7 +57,7 @@ function nextSong(){
   else{
     songNumber++
   }
-  music.src='media/'+musicList[songNumber]+'.mp3'
+  music.src='/static/media/'+musicList[songNumber]+'.mp3'
 
   if(musicPlaying){
     music.play();
@@ -58,7 +73,7 @@ function prevSong(){
   else{
     songNumber--
   }
-  music.src='media/'+musicList[songNumber]+'.mp3';
+  music.src='/static/media/'+musicList[songNumber]+'.mp3';
 
   if(musicPlaying){
     music.play();
@@ -135,7 +150,6 @@ const mAttentionLevel=document.getElementById('modelAttentionLevel')
 const bluetoothIcon=document.getElementById('bluetoothIcon')
 const alertIcon=document.getElementById('alertIcon')
 
-let bIconPressed=true;
 let aIconPressed=true;
 
 
@@ -147,7 +161,7 @@ let attentionValue=0;
 let counter=0;
 let totalAttentionTemp=0;
 let averageAttention=''
-let timer1;
+// let timer1;
 let startTime=0;
 let endTime=0;
 let elapsedTime='';
@@ -172,7 +186,7 @@ let userData = {
 
 function featureDecider(){
   if(isRecording){
-	clearInterval(timer1)
+	  // clearInterval(timer1)
 
     endTime=Date.now();
     
@@ -186,6 +200,7 @@ function featureDecider(){
     averageAttention=calculateAveAttention(totalAttentionTemp,counter)+'%'
 
     isRecording=false;
+    attentionValueCounter = 0;
 
     fillObject();
 
@@ -206,18 +221,19 @@ function featureDecider(){
     highestConsecutiveTime=0;
     
     music.volume=0.5
-    
+
+    updateLatestSession()    
     /* send object to back-end here*/
-	socket.onclose = function (e) {
-		console.log('The connection has been closed successfully.');
-	};
-	socket.onclose()
+	// socket.onclose = function (e) {
+	// 	console.log('The connection has been closed successfully.');
+	// };
+	// socket.onclose()
 
 
   }
   else if(!isRecording){
 
-    timer1=setInterval(updateChart,1000);
+    // timer1=setInterval(updateChart,1000);
 
     currentTime=dateCheck.getHours();
     
@@ -249,40 +265,41 @@ function unDisableButtons(){
   const elementsChange = document.getElementsByClassName("contr1");
   for (let i = 0; i < elementsChange.length; i++) {
     elementsChange[i].classList.remove('disabled');
-}
+  }
 
 }
 
 
 
 
-function updateChart(){
+function updateChart(tempDjangoData){
 	
-	
-	
-	socket.onmessage = function(e){
-	previousValue=false;
-	var djangoData = JSON.parse(e.data);
-	console.log(djangoData);
-	
-	dataObj.data.datasets[0].data.shift();
-	dataObj.data.datasets[0].data.push(djangoData.Attention);
+  previousValue=false;
+  let djangoData = tempDjangoData;
+  
+  dataObj.data.datasets[0].data.shift();
+  dataObj.data.datasets[0].data.push(djangoData.Attention);
 
   attentionValue=djangoData.Attention
+
+  if(attentionValue < 50) {
+    playAlert()
+  }
+
   attentionValueSum=attentionValueSum+attentionValue;
   attentionValueCounter=attentionValueCounter+1;
 
-  if((attentionValueCounter%6)==0){ //this will play alert every 60 seconds if average attention was low
-    if((attentionValueSum/6)<50){
-      playAlert();
+  if(attentionValueCounter==30){ //this will play alert every 60 seconds if average attention was low
+    if((attentionValueSum/30)<50){
       attentionValueSum=0
     }
-    if((attentionValueSum/6)>=50){
+    if((attentionValueSum/30)>=50){
       attentionValueCounter=0
     }
     
-    if(attentionValueCounter==60){ //this will display modal if attention was consecutively low for 10 minutes
+    if(attentionValueCounter==300){ //this will display modal if attention was consecutively low for 10 minutes
       myModal2.show()
+      playAlert()
       attentionValueCounter=0
     }
 
@@ -300,12 +317,11 @@ function updateChart(){
     highestConsecutiveTemp=0;
   }
   
-	myChart.update();
+  myChart.update();
   counter++
   totalAttentionTemp=totalAttentionTemp+attentionValue
-  }
   
-  }
+}
   
   
   
@@ -401,16 +417,6 @@ function learningModeReadWrite(){
     alert1.play()
   }
 
-  function changeBluetoothIcon(){
-    if(bIconPressed){
-      bluetoothIcon.src="https://img.icons8.com/material-rounded/96/000000/bluetooth-off.png"
-      bIconPressed=false;
-    }
-    else{
-      bluetoothIcon.src="https://img.icons8.com/material-rounded/96/000000/bluetooth.png"
-      bIconPressed=true;
-    }
-  }
 
   function changeAlertIcon(){
     if(aIconPressed){
@@ -428,4 +434,58 @@ function learningModeReadWrite(){
 
   function closeModal2(){
     myModal2.hide()
+  }
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+  }
+
+  function saveAttention(tempDjangoSaveData){
+    $.ajax(
+    {
+      type:"POST",
+      url: "/test1/saveattention/",
+      mode: 'same-origin',
+      headers: {
+        "X-CSRFToken" : getCookie('csrftoken')
+      },
+      data: {
+        attention: tempDjangoSaveData.Attention.toFixed(2),
+        status: tempDjangoSaveData.Status,
+        learningMethod: (learningMode=='Read/Write'? 'r':'w')
+
+      },
+      success: function(data) 
+        {
+          console.log("save success", data)
+        }
+    })
+  }
+
+  function updateLatestSession(){
+    $.ajax(
+    {
+      type:"POST",
+      url: "/test1/updatelatestsession/",
+      mode: 'same-origin',
+      headers: {
+        "X-CSRFToken" : getCookie('csrftoken')
+      },
+      success: function(data) 
+        {
+          console.log("update success", data)
+        }
+    })
   }

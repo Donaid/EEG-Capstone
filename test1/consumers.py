@@ -22,7 +22,7 @@ class test2(AsyncJsonWebsocketConsumer):
                 self.channel_name
             
         )
-        await self.disconnect()
+        # await self.disconnect()
         
         #Receive data from database.
     async def receive(self, text_data):
