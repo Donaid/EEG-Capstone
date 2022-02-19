@@ -3,7 +3,7 @@ import numpy as np
 import scipy
 from scipy import signal
 from scipy.integrate import simps
-
+from pandas.errors import EmptyDataError
 import pickle
 
 import websocket
@@ -20,6 +20,7 @@ eeg_bands = {'Delta': (0.5, 4),
 segment_size = 4 * fs
 
 status = "disconnected"
+result = 0
 
 def bandpassfilter(signal):
 
@@ -39,6 +40,7 @@ def bandpassfilter(signal):
 
 def main():
   global status
+  global result
 
   try:
     data = pd.read_csv('demo.csv')
@@ -70,8 +72,8 @@ def main():
 
     probability = (ML_model.predict_proba(data)) ## probability
     result = probability[0][1]*100
-    # result = 100 - result
-  except pandas.io.common.EmptyDataError:
+    result = 100 - result
+  except EmptyDataError:
     result = result
 
   # data = pd.read_csv('demo.csv')

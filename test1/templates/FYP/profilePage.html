@@ -67,7 +67,7 @@
             <ul class="list-group list-group-flush">
               <li class="list-group-item mb-2" id="userName" >Username : user1</li>
               <li class="list-group-item mb-2" id="idealStudyTime" >Ideal Study Time: 03:00 PM</li>
-              <li class="list-group-item mb-2" >Hihest Consecutive Attention :</li>
+              <li class="list-group-item mb-2" >Highest Consecutive Attention :</li>
               
               <li class="list-group-item mb-2" >
               <div class="mt-2">
@@ -401,7 +401,7 @@ const highToTotalRW=document.getElementById('highToTotalRW');
 
 var person2 = JSON.parse("{{ personJson|escapejs }}");
 
-value1 = person2['userName'];
+// value1 = person2['userName'];
 value2 = parseInt(person2['idealStudyTime']);
 value3 = parseInt(person2['audioVideoHighAttention']);
 value4 = parseInt(person2['readWriteHighAttention']);
@@ -413,16 +413,16 @@ value9 = parseInt(person2['graphHighAttention']);
 value10 = parseInt(person2['graphLowAttention']);
 
 let userData={
-  userName:value1,
-  idealStudyTime:value2,
-  audioVideoHighAttention:value3,
-  readWriteHighAttention:value4,
-  sessionsCompletedAV:value5,
-  sessionsCompletedRW:value6,
-  highToTotalAV:value7,
-  highToTotalRW:value8,
-  graphHighAttention:value9,
-  graphLowAttention:value10
+  userName:person2.userName,
+  idealStudyTime:"12:00 PM",
+  audioVideoHighAttention:30,
+  readWriteHighAttention:43,
+  sessionsCompletedAV:person2.sessionsCompletedAV,
+  sessionsCompletedRW:person2.sessionsCompletedRW,
+  highToTotalAV:person2.highToTotalAV,
+  highToTotalRW:person2.highToTotalRW,
+  graphHighAttention:person2.graphHighAttention,
+  graphLowAttention:person2.graphLowAttention
 }
 
 
@@ -590,7 +590,7 @@ var wChart = new Chart(ctx4, {
 
 const date1=document.getElementById('dateSelected1');
 var errorModal = new bootstrap.Modal(document.getElementById("errorModal"), {});
-
+date1.value = person2.date
 
 
 
@@ -686,30 +686,61 @@ function timer1(){
   setTimeout(updateAll,1000)
 }
 
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          // Does this cookie string begin with the name we want?
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+          }
+      }
+  }
+  return cookieValue;
+}
+
 
 function changeData(){//this function is for when the user selects Date
-  dateFound = true;
-  date1.value
 
-  if(dateFound){
+  $.ajax(
+  {
+    type:"POST",
+    url: "/test1/updateprofiledata/",
+    mode: 'same-origin',
+    headers: {
+      "X-CSRFToken" : getCookie('csrftoken')
+    },
+    data: {
+      targetDate : date1.value
+    },
+    success: function(data) {
+      if(data.dataAvailable == 1){
+        //update this object with new date
+        // graphData1={
+        //   learningMode:['r','w','r','w'],
+        //   dailySessionData:[10,10,10,10],//the attention values for daily sessions
+        //   daily:[10,10,10,10],//the attention values for the overall day
+        //   weekly:[10,10,10,10]//the attention values for the overall week
 
-  
-  //update this object with new date
-  graphData1={
-    learningMode:['r','w','r','w'],
-    dailySessionData:[10,10,10,10],//the attention values for daily sessions
-    daily:[10,10,10,10],//the attention values for the overall day
-    weekly:[10,10,10,10]//the attention values for the overall week
-  
-  }
+        // }
+        graphData1.learningMode = data.learningMode;
+        graphData1.dailySessionData = data.dailySessionData;
+        graphData1.daily = data.daily;
+        updateAll();
+      }
+      else if(data.dataAvailable == 0) {
+        date1.value = data.date;
+        errorModal.show();
+      }
+    }
+  })
+  // dateFound = true;
+  // date1.value
 
-  updateAll()
 
-}
-
-else{
-  errorModal.show()
-}
 
 }
 

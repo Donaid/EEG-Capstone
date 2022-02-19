@@ -13,7 +13,8 @@ urlpatterns = [
     path('signUpPage/', views.signUpPage, name='signUpPage'),
     path('profilePage/', views.profilePage, name='profilePage'),
     path('saveattention/', views.saveAttention, name='saveAttention'),
-    path('updatelatestsession/', views.updateLatestSession, name='updateLatestSession')
+    path('updatelatestsession/', views.updateLatestSession, name='updateLatestSession'),
+    path('updateprofiledata/', views.updateProfileData, name='updateProfileData')
     
 ]
 

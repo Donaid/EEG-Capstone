@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.template import loader
 
-from django.db.models import Sum
+from django.db.models import Sum, Avg
 from django.http import JsonResponse
 # from test1.models import feature
 from django.contrib import auth
@@ -22,7 +22,7 @@ from django.views.decorators.csrf import csrf_exempt
 # from .models import userData
 from .models import State, Session
 from django.contrib.auth.decorators import login_required
-import datetime
+from datetime import datetime
 import statistics
 
 # @csrf_exempt
@@ -50,26 +50,87 @@ def profilePage(request):
     # print(len(State.objects.filter(user=request.user, learningMethod='r')))
     # print(len(State.objects.filter(user=request.user, learningMethod='w')))
 
+    #top
+    sessionsCompletedAV = 0
+    sessionsCompletedRW = 0
+    highToTotalAV = 0
+    highToTotalRW = 0
+    graphHighAttention = 0
+
+    #bottom
     learningMode = []
     dailySessionData = []
     daily = []
     weekly = []
-    
-    latestStateDate = State.objects.filter(user=request.user, date=State.objects.filter(user=request.user,).latest('date').date)
-    latestStateDateSession = latestStateDate.latest('session').session
-    earliestStateDateSession = latestStateDate.earliest('session').session
-    # for x in range(earliestStateDateSession, latestStateDateSession + 1):
-    
-    for x in range(latestStateDateSession, earliestStateDateSession + 1):
-        tempStateSessions = State.objects.filter(user=request.user, session=x)
-        learningMode.append(tempStateSessions.latest('time').learningMethod)
-        count = 0 
-        tempAttentionSum = 0
-        for tempStateSession in tempStateSessions:
-            tempAttentionSum += tempStateSession.attention
-            count += 1
+    latestStateDate = datetime.now()
 
-        dailySessionData.append(round(tempAttentionSum / count, 2))
+    try:
+        #top
+        # totalAV = len(State.objects.filter(user=request.user, learningMethod='w'))
+        # totalRW = len(State.objects.filter(user=request.user, learningMethod='r'))
+        # highAV = len(State.objects.filter(user=request.user, learningMethod='w', attention__gte=50))
+        # highRW = len(State.objects.filter(user=request.user, learningMethod='r', attention__gte=50))
+        highAV = 0
+        highRW = 0
+
+        #bottom
+        latestStateDate = State.objects.filter(user=request.user,).latest('date').date
+        latestState = State.objects.filter(user=request.user, date=latestStateDate)
+        latestStateDateSession = latestState.latest('session').session
+        earliestStateDateSession = latestState.earliest('session').session
+
+
+        #top
+        for x in range(1, latestStateDateSession + 1):
+            try:
+                tempStateSessions = State.objects.filter(user=request.user, session=x)
+                if(tempStateSessions.latest('id').learningMethod == 'r'):
+                    sessionsCompletedRW += 1
+                    tempRW = tempStateSessions.aggregate(Avg('attention'))
+                    if(tempRW['attention__avg'] >= 50):
+                        highRW += 1
+                elif(tempStateSessions.latest('id').learningMethod == 'w'):
+                    sessionsCompletedAV += 1
+                    tempAV = tempStateSessions.aggregate(Avg('attention'))
+                    if(tempAV['attention__avg'] >= 50):
+                        highAV += 1
+            except State.DoesNotExist: 
+                pass
+
+        totalAV = sessionsCompletedAV
+        if(totalAV == 0):
+            totalAV = 1
+
+        totalRW = sessionsCompletedRW
+        if(totalRW == 0):
+            totalRW = 1
+        
+        highToTotalAV = round((highAV * 100) / totalAV, 2)
+        highToTotalRW = round((highRW *100) / totalRW, 2)
+
+
+        allTotalSessions = sessionsCompletedRW + sessionsCompletedRW
+        if(allTotalSessions == 0):
+            allTotalSessions = 1
+        graphHighAttention = (highAV + highRW) / allTotalSessions
+        
+
+        #bottom
+        for x in range(earliestStateDateSession, latestStateDateSession + 1):
+            try:
+                tempStateSessions = State.objects.filter(user=request.user, session=x)
+                learningMode.append(tempStateSessions.latest('id').learningMethod)
+                count = 0 
+                tempAttentionSum = 0
+                for tempStateSession in tempStateSessions:
+                    tempAttentionSum += tempStateSession.attention
+                    count += 1
+
+                dailySessionData.append(round(tempAttentionSum / count, 2))
+            except State.DoesNotExist: 
+                pass
+    except State.DoesNotExist:
+        pass
 
     highW = 0
     lowW = 0
@@ -102,16 +163,95 @@ def profilePage(request):
     daily.append((lowR * 100) / (totalR))
 
     persondict = {
+        'userName' : request.user.username,
+        'date' : latestStateDate.strftime("%Y-%m-%d"),
         'dailySessionData': dailySessionData,
         'learningMode': learningMode,
-        'daily' : daily
+        'daily' : daily,
+        'sessionsCompletedAV' : sessionsCompletedAV,
+        'sessionsCompletedRW' : sessionsCompletedRW,
+        'highToTotalAV' : highToTotalAV,
+        'highToTotalRW' : highToTotalRW,
+        'graphHighAttention' : round(graphHighAttention, 2),
+        'graphLowAttention' : round(10 - graphHighAttention, 2)
     }
-    print(persondict)
+    # print(persondict)
     personJson = json.dumps(persondict)
     return render(request, 'FYP/profilePage.html', {'personJson': personJson})
     # return render(request, 'FYP/profilePage.html')
 
+def updateProfileData(request):
+    if request.method == "POST":
+        # print(request.POST['targetDate'])
+        targetDate = request.POST['targetDate']
+        learningMode = []
+        dailySessionData = []
+        daily = []
+        weekly = []
+        dataAvailable = 1
+        latestStateDate = datetime.now()
 
+        try:
+            latestStateDate = State.objects.filter(user=request.user,).latest('date').date
+            latestState = State.objects.filter(user=request.user, date=targetDate)
+            latestStateDateSession = latestState.latest('session').session
+            earliestStateDateSession = latestState.earliest('session').session
+
+            for x in range(earliestStateDateSession, latestStateDateSession + 1):
+                try:
+                    tempStateSessions = State.objects.filter(user=request.user, session=x)
+                    learningMode.append(tempStateSessions.latest('id').learningMethod)
+                    count = 0 
+                    tempAttentionSum = 0
+                    for tempStateSession in tempStateSessions:
+                        tempAttentionSum += tempStateSession.attention
+                        count += 1
+
+                    dailySessionData.append(round(tempAttentionSum / count, 2))
+                except State.DoesNotExist: 
+                    pass
+        except State.DoesNotExist:
+            dataAvailable = 0
+
+        highW = 0
+        lowW = 0
+        highR = 0
+        lowR = 0
+        totalW = 0
+        totalR = 0
+        for x in range(0, len(learningMode)):
+            if(learningMode[x] == 'w'):
+                if(dailySessionData[x] >= 50):
+                    highW += 1
+                else:
+                    lowW += 1
+            elif(learningMode[x] == 'r'):
+                if(dailySessionData[x] >= 50):
+                    highR += 1
+                else:
+                    lowR += 1
+        
+        totalW = highW + lowW
+        totalR = highR + lowR
+        if(totalW == 0):
+            totalW = 1
+        if(totalR == 0):
+            totalR = 1
+        
+        daily.append((highW * 100) / (totalW))
+        daily.append((lowW * 100) / (totalW))
+        daily.append((highR * 100) / (totalR))
+        daily.append((lowR * 100) / (totalR))
+
+        json_data = json.dumps({
+            'dataAvailable': dataAvailable,
+            'dailySessionData': dailySessionData,
+            'learningMode': learningMode,
+            'daily' : daily,
+            'date' : latestStateDate.strftime("%Y-%m-%d"),
+        })
+
+        return HttpResponse(json_data, content_type="application/json")
 
 def signInPage(request):
     errMsg = {'error':'d'}
@@ -176,7 +316,7 @@ def homePage(request):
     # context = {
     #     'all_users' : all_users,
     # }
-    return render(request,'FYP/homePage.html')
+    return render(request,'FYP/homePage.html', {'userName' : request.user.username})
     
 def detail(request,  user_id):
     return HttpResponse("<h2>this is a detail page : " + str(user_id)+"</h2>")

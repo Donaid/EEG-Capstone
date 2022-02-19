@@ -175,7 +175,7 @@ let attentionValueCounter=0;
 //this object will have all the data stored in this at the end of the session
 
 let userData = {
-  userName:'',
+  // userName:'',
   learningType:'',
   sessionTime:0,
   attentionLevel:0,
@@ -351,7 +351,7 @@ function showModal () {
   
 
 function fillObject(){
-  userData.userName=username;
+  // userData.userName=username;
   userData.learningType=learningMode;
   userData.sessionTime=elapsedTime
   userData.attentionLevel=averageAttention
@@ -362,10 +362,10 @@ function fillObject(){
 
 
 function updateModal(){
-  mUserName.innerHTML='Username : ' + userData.userName;
+  // mUserName.innerHTML='Username : ' + userData.userName;
   mLearningMode.innerHTML='Learning Mode : ' + userData.learningType;
   mSessionTime.innerHTML='Session Time : ' + userData.sessionTime
-  mAttentionLevel.innerHTML='Attention Level : ' + userData.attentionLevel;
+  mAttentionLevel.innerHTML='Avg Attention Level : ' + userData.attentionLevel;
 }  
 
 function clearGraph(){
@@ -398,18 +398,22 @@ function learningModeReadWrite(){
 
   function reduceVolume(){
     if(musicPlaying){
-    if(music.volume>=0.1){
-      music.volume=music.volume-0.1
+      if(music.volume>=0.1){
+        music.volume=music.volume-0.1
+      }
     }
-  }
   }
 
   function increaseVolume(){
     if(musicPlaying){
-    if(music.volume<1){
-      music.volume=music.volume+0.1
+      let tempVolume = music.volume + 0.1
+      if(tempVolume > 1) {
+        music.volume = 1
+      }
+      else if(music.volume<1){
+        music.volume=music.volume+0.1
+      }
     }
-  }
   }
 
 
