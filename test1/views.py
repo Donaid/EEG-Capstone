@@ -1,3 +1,4 @@
+from django.forms import ValidationError
 from django.shortcuts import render, redirect
 import json
 from django.http import HttpResponse
@@ -181,7 +182,7 @@ def profilePage(request):
     # return render(request, 'FYP/profilePage.html')
 
 def updateProfileData(request):
-    if request.method == "POST":
+    if request.method == "POST" and request.user.is_authenticated:
         # print(request.POST['targetDate'])
         targetDate = request.POST['targetDate']
         learningMode = []
@@ -190,6 +191,12 @@ def updateProfileData(request):
         weekly = []
         dataAvailable = 1
         latestStateDate = datetime.now()
+
+        # try:
+        #     datetime.strptime(targetDate, '%Y-%m-%d')
+        #     print('valid date')
+        # except ValueError:
+        #     print('invalid date')
 
         try:
             latestStateDate = State.objects.filter(user=request.user,).latest('date').date
@@ -292,8 +299,6 @@ def signUpPage(request):
             username = request.POST['userid']
             password = request.POST['userpw1']
             
-            # Userssa = Userss(userid=username,userpw=password)
-            # Userssa.save()
             try:
                 User.objects.get(username=username)
             except User.DoesNotExist:
@@ -327,7 +332,7 @@ def logout_view(request):
     return redirect('signInPage')
 
 def saveAttention(request):
-    if request.method == "POST":
+    if request.method == "POST" and request.user.is_authenticated:
         latestUserSession = Session.objects.get(user=request.user)
         save_attention = State(attention=request.POST['attention'], learningMethod=request.POST['learningMethod'], user=request.user, session=latestUserSession.latestSession)
         save_attention.save()
@@ -335,7 +340,7 @@ def saveAttention(request):
         return HttpResponse(json_data, content_type="application/json")
 
 def updateLatestSession(request):
-    if request.method == "POST":
+    if request.method == "POST" and request.user.is_authenticated:
         updateSession = Session.objects.get(user=request.user)
         updateSession.latestSession = updateSession.latestSession + 1
         updateSession.save()

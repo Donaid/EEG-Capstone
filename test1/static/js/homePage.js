@@ -89,7 +89,7 @@ const ctx = document.getElementById('myChart').getContext('2d');
 const dataObj = {
     type: 'line',
     data: {
-        labels: ['15s','15s','15s','15s','15s','15s'],
+        labels: ['10s','10s','10s','10s','10s','10s'],
         datasets: [{
             label: 'Attention Graph',
             data: [0,0,0,0,0,0],
