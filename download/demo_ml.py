@@ -111,7 +111,12 @@ def main():
 
   # ws = websocket.WebSocket()
   # ws.connect('ws://localhost:8000/ws/test1')
-  ws.send(json.dumps({'Attention': result, 'Status':status}))
+  # ws.send(json.dumps({'Attention': result, 'Status':status}))
+  try:
+    ws.send(json.dumps({'Attention': result, 'Status':status}))
+  except ConnectionResetError:
+    ws.connect('ws://localhost:8000/ws/test1')
+    ws.send(json.dumps({'Attention': result, 'Status':status}))
   time.sleep(5.7)
   
 

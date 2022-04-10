@@ -1,183 +1,39 @@
-from sys import getprofile
-from urllib.request import Request
-from django.forms import ValidationError
 from django.shortcuts import render, redirect
 import json
 from django.http import HttpResponse
 
-from django.contrib.auth.models import User
-from django.template import loader
-
-from django.db.models import Sum, Avg
-from django.http import JsonResponse
-from django.contrib import auth
-from django.contrib.auth.models import AbstractBaseUser, UserManager, User
-from django.http import HttpResponseRedirect
-
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate, logout
-from django.contrib import messages
-from django.contrib.auth.hashers import check_password
-from django.views.decorators.csrf import csrf_exempt
-from .models import State, Session
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from datetime import datetime, timedelta
-import statistics
 
-# @csrf_exempt
+from django.db.models import Avg
+from .models import State, Session
+
+from datetime import datetime, timedelta
+
+
 @login_required(redirect_field_name=None)
 def profilePage(request):
-    #top
-    sessionsCompletedAV = 0
-    sessionsCompletedRW = 0
-    highToTotalAV = 0
-    highToTotalRW = 0
-    graphHighAttention = 0
-
-    #bottom
-    learningMode = []
-    dailySessionData = []
-    daily = []
-    weekly = []
-    latestStateDate = datetime.now()
-
-    try:
-        #top
-        # totalAV = len(State.objects.filter(user=request.user, learningMethod='w'))
-        # totalRW = len(State.objects.filter(user=request.user, learningMethod='r'))
-        # highAV = len(State.objects.filter(user=request.user, learningMethod='w', attention__gte=50))
-        # highRW = len(State.objects.filter(user=request.user, learningMethod='r', attention__gte=50))
-        highAV = 0
-        highRW = 0
-
-        #bottom
-        latestStateDate = State.objects.filter(user=request.user,).latest('date').date
-        latestState = State.objects.filter(user=request.user, date=latestStateDate)
-        latestStateDateSession = latestState.latest('session').session
-        earliestStateDateSession = latestState.earliest('session').session
-
-
-        #top
-        for x in range(1, latestStateDateSession + 1):
-            try:
-                tempStateSessions = State.objects.filter(user=request.user, session=x)
-                if(tempStateSessions.latest('id').learningMethod == 'r'):
-                    sessionsCompletedRW += 1
-                    tempRW = tempStateSessions.aggregate(Avg('attention'))
-                    if(tempRW['attention__avg'] >= 50):
-                        highRW += 1
-                elif(tempStateSessions.latest('id').learningMethod == 'w'):
-                    sessionsCompletedAV += 1
-                    tempAV = tempStateSessions.aggregate(Avg('attention'))
-                    if(tempAV['attention__avg'] >= 50):
-                        highAV += 1
-            except State.DoesNotExist: 
-                pass
-
-        totalAV = sessionsCompletedAV
-        if(totalAV == 0):
-            totalAV = 1
-
-        totalRW = sessionsCompletedRW
-        if(totalRW == 0):
-            totalRW = 1
-        
-        highToTotalAV = round((highAV * 100) / totalAV, 2)
-        highToTotalRW = round((highRW *100) / totalRW, 2)
-
-
-        allTotalSessions = sessionsCompletedRW + sessionsCompletedRW
-        if(allTotalSessions == 0):
-            allTotalSessions = 1
-        graphHighAttention = (highAV + highRW) / allTotalSessions
-        
-    except State.DoesNotExist:
-        pass
-
     return render(request, 'FYP/profilePage.html',)
 
-#update profile data
-""" 
 def updateProfileData(request):
     if request.method == "POST" and request.user.is_authenticated:
-        # print(request.POST['targetDate'])
-        targetDate = request.POST['targetDate']
-        learningMode = []
-        dailySessionData = []
-        daily = []
-        weekly = []
-        dataAvailable = 1
-        latestStateDate = datetime.now()
+        # top
+        idealStudyTime = "-"
+        audioVideoHighAttention = 0
+        readWriteHighAttention = 0
+        profileSummary = {
+            'sessionsCompletedAV': 0,
+            'sessionsCompletedRW': 0,
+            'highToTotalAV': 0,
+            'highToTotalRW': 0,
+            'graphHighAttention': 0,
+            'graphLowAttention': 0
+        }
 
-        try:
-            latestStateDate = State.objects.filter(user=request.user,).latest('date').date
-            latestState = State.objects.filter(user=request.user, date=targetDate)
-            latestStateDateSession = latestState.latest('session').session
-            earliestStateDateSession = latestState.earliest('session').session
-
-            for x in range(earliestStateDateSession, latestStateDateSession + 1):
-                try:
-                    tempStateSessions = State.objects.filter(user=request.user, session=x)
-                    learningMode.append(tempStateSessions.latest('id').learningMethod)
-                    count = 0 
-                    tempAttentionSum = 0
-                    for tempStateSession in tempStateSessions:
-                        tempAttentionSum += tempStateSession.attention
-                        count += 1
-
-                    dailySessionData.append(round(tempAttentionSum / count, 2))
-                except State.DoesNotExist: 
-                    pass
-        except State.DoesNotExist:
-            dataAvailable = 0
-
-        highW = 0
-        lowW = 0
-        highR = 0
-        lowR = 0
-        totalW = 0
-        totalR = 0
-        for x in range(0, len(learningMode)):
-            if(learningMode[x] == 'w'):
-                if(dailySessionData[x] >= 50):
-                    highW += 1
-                else:
-                    lowW += 1
-            elif(learningMode[x] == 'r'):
-                if(dailySessionData[x] >= 50):
-                    highR += 1
-                else:
-                    lowR += 1
-        
-        totalW = highW + lowW
-        totalR = highR + lowR
-        if(totalW == 0):
-            totalW = 1
-        if(totalR == 0):
-            totalR = 1
-        
-        daily.append((highW * 100) / (totalW))
-        daily.append((lowW * 100) / (totalW))
-        daily.append((highR * 100) / (totalR))
-        daily.append((lowR * 100) / (totalR))
-
-        json_data = json.dumps({
-            'dataAvailable': dataAvailable,
-            'dailySessionData': dailySessionData,
-            'learningMode': learningMode,
-            'daily' : daily,
-            'date' : latestStateDate.strftime("%Y-%m-%d"),
-        })
-
-        return HttpResponse(json_data, content_type="application/json")
-"""
-
-def updateProfileData(request):
-    if request.method == "POST" and request.user.is_authenticated:
-        
         #bottom
         dataAvailable = 0
-        latestStateDate = getProfileLatestDate(request)
+        latestStateDate = getProfileLatestDate(request.user)
         targetDate = latestStateDate
 
         learningMode = []
@@ -193,31 +49,36 @@ def updateProfileData(request):
             temp = State.objects.filter(user=request.user, date=targetDate)
             if len(temp) == 0:
                 dataAvailable = 0
-        elif "targetDate" not in request.POST:
-            pass
-            
 
         # check if any data in State table
         if(dataAvailable == 1):
-            profileDailySessions = getProfileDailySessions(request, targetDate)
+            profileDailySessions = getProfileDailySessions(request.user, targetDate)
             learningMode = profileDailySessions['learningMode']
             dailySessionData = profileDailySessions['dailySessionData']
             daily = getProfileDaily(learningMode, dailySessionData)
 
-        weekly = getProfileWeekly(request, targetDate)
+            if "targetDate" not in request.POST:
+                targetUserSession = Session.objects.get(user=request.user)
+                audioVideoHighAttention = targetUserSession.consecutiveHighW
+                readWriteHighAttention = targetUserSession.consecutiveHighR
+                
+                profileSummary = getProfileSummary(request.user)
+                idealStudyTime = getProfileIdealTime(request.user)
+
+        weekly = getProfileWeekly(request.user, targetDate)
 
         return HttpResponse(json.dumps({
-            'status': 'success onload',
+            'status': 'success',
             'userName': request.user.username,
-            'idealStudyTime': '1200',
-            'audioVideoHighAttention': 1,
-            'readWriteHighAttention': 1,
-            'sessionsCompletedAV': 1,
-            'sessionsCompletedRW': 1,
-            'highToTotalAV': 1,
-            'highToTotalRW': 1,
-            'graphHighAttention': 1,
-            'graphLowAttention': 1,
+            'idealStudyTime': idealStudyTime,
+            'audioVideoHighAttention': audioVideoHighAttention,
+            'readWriteHighAttention': readWriteHighAttention,
+            'sessionsCompletedAV': profileSummary['sessionsCompletedAV'],
+            'sessionsCompletedRW': profileSummary['sessionsCompletedRW'],
+            'highToTotalAV': profileSummary['highToTotalAV'],
+            'highToTotalRW': profileSummary['highToTotalRW'],
+            'graphHighAttention': profileSummary['graphHighAttention'],
+            'graphLowAttention': profileSummary['graphLowAttention'],
             'dataAvailable': dataAvailable,
             'date': latestStateDate.strftime("%Y-%m-%d") if (not isinstance(latestStateDate, str)) else latestStateDate,
             'learningMode': learningMode,
@@ -226,29 +87,92 @@ def updateProfileData(request):
             'weekly': weekly
         }), content_type="application/json")
 
-def getProfileLatestDate(request):
+def getProfileIdealTime(user):
+    highestAttention = 0
+    idealStudyTime = ""
+    for hour in range(0, 24):
+        start_time = datetime.strptime(str(hour) + ":00:00.000000", "%H:%M:%S.%f")
+        end_time = datetime.strptime(str(hour) + ":59:59.999999", "%H:%M:%S.%f")
+        try: 
+            targetTimeState = State.objects.filter(user=user, time__range=(start_time, end_time))
+            if len(targetTimeState) != 0:
+                averageAttention = round(targetTimeState.aggregate(Avg('attention'))['attention__avg'], 2)
+                print(f"average {hour} {averageAttention}")
+                if(averageAttention > 0):
+                    if(averageAttention > highestAttention):
+                        highestAttention = averageAttention
+                        idealStudyTime = start_time.strftime('%H%M')
+                    elif(averageAttention == highestAttention):
+                        if idealStudyTime.isspace():
+                           idealStudyTime =  start_time.strftime('%H%M')
+                        else:
+                            idealStudyTime += f"/ {start_time.strftime('%H%M')}"
+        except State.DoesNotExist:
+            pass
+    
+    return "-" if idealStudyTime.isspace() else idealStudyTime
+
+def getProfileSummary(user):
+    profileSummary = {
+        'sessionsCompletedAV': 0,
+        'sessionsCompletedRW': 0,
+        'highToTotalAV': 0,
+        'highToTotalRW': 0,
+        'graphHighAttention': 0,
+        'graphLowAttention': 0
+    }
+
+    latestSession = State.objects.filter(user=user).latest('id').session
+    for x in range(1, latestSession + 1):
+        try:
+            targetSession = State.objects.filter(user=user, session=x)
+            if len(targetSession) != 0:
+                targetSessionAverage = round(targetSession.aggregate(Avg('attention'))['attention__avg'], 2)
+                if(targetSession.latest('id').learningMethod == 'r'):
+                    profileSummary['sessionsCompletedRW'] += 1
+                    if targetSessionAverage >= 50:
+                        profileSummary['highToTotalRW'] += 1
+                        profileSummary['graphHighAttention'] += 1
+                else: 
+                    profileSummary['sessionsCompletedAV'] += 1
+                    if targetSessionAverage >= 50:
+                        profileSummary['highToTotalAV'] += 1
+                        profileSummary['graphHighAttention'] += 1
+        except State.DoesNotExist:
+            pass
+        
+    print(profileSummary['highToTotalRW'])
+    profileSummary['graphLowAttention'] = profileSummary['sessionsCompletedAV'] + profileSummary['sessionsCompletedRW'] - profileSummary['graphHighAttention']
+    if(profileSummary['sessionsCompletedRW'] > 0):
+        profileSummary['highToTotalRW'] = round((profileSummary['highToTotalRW'] * 100) / profileSummary['sessionsCompletedRW'], 2)
+    if(profileSummary['sessionsCompletedAV'] > 0):
+        profileSummary['highToTotalAV'] = round((profileSummary['highToTotalAV'] * 100) / profileSummary['sessionsCompletedAV'], 2)
+
+    return profileSummary
+
+def getProfileLatestDate(user):
     latestStateDate = datetime.now()
     try:
-        latestStateDate = State.objects.filter(user=request.user,).latest('id').date
+        latestStateDate = State.objects.filter(user=user,).latest('id').date
     except State.DoesNotExist:
         latestStateDate = ''
     
     return latestStateDate
 
-def getProfileDailySessions(request, targetDate):
+def getProfileDailySessions(user, targetDate):
     profileDailySessions = {
         'learningMode': [],
         'dailySessionData': []
     }
 
     try:
-        latestDateState = State.objects.filter(user=request.user, date=targetDate)
+        latestDateState = State.objects.filter(user=user, date=targetDate)
         latestStateLastSession = latestDateState.latest('id').session
         latestStateFirstSession = latestDateState.earliest('id').session
 
         for x in range(latestStateFirstSession, latestStateLastSession + 1):
             try:
-                tempState = State.objects.filter(user=request.user, session=x)
+                tempState = State.objects.filter(user=user, session=x)
                 profileDailySessions['learningMode'].append(tempState.latest('id').learningMethod)
                 profileDailySessions['dailySessionData'].append(round(tempState.aggregate(Avg('attention'))['attention__avg'], 2))
             except State.DoesNotExist:
@@ -291,7 +215,7 @@ def getProfileDaily(learningMode, dailySessionData):
     daily.extend((highW, lowW, highR, lowR))
     return daily
 
-def getProfileWeekly(request, targetDate):
+def getProfileWeekly(user, targetDate):
     weekly = []
     if not isinstance(targetDate, str):
         weeklySessionData = []
@@ -299,7 +223,7 @@ def getProfileWeekly(request, targetDate):
         start = targetDate - timedelta(days=targetDate.weekday())
 
         for singleDate in (start + timedelta(n) for n in range(7)):
-            profileWeeklySession = getProfileDailySessions(request, singleDate)
+            profileWeeklySession = getProfileDailySessions(user, singleDate)
             weeklySessionData.extend(profileWeeklySession['dailySessionData'])
             learningMode.extend(profileWeeklySession['learningMode'])
 
@@ -329,16 +253,6 @@ def signInPage(request):
             errMsg['error'] = "Username or Password is Incorrect"
             errMsg['inputStatus'] = "is-invalid"
 
-        # if not (username or password):
-        #     errMsg['error'] = "id or password is not entered"
-        # else:
-        #     user2 = Userss.objects.get(userid = username)
-        #     if user2.userpw == password:
-        #         request.session['user'] = user2.id
-
-        #         return redirect('homePage')
-        #     else:
-        #         errMsg['error'] = "re-enter password"
         return render(request, 'FYP/signInPage.html', errMsg)
     
     
@@ -392,10 +306,11 @@ def updateLatestSession(request):
                 updateSession.latestSession = latestStateSession + 1
             
             if(request.POST['learningMethod'] == 'r'):
-                if(request.POST['consecutiveHigh'] > updateSession.consecutiveHighR):
+                if(int(request.POST['consecutiveHigh']) > updateSession.consecutiveHighR):
                     updateSession.consecutiveHighR = request.POST['consecutiveHigh']
             elif(request.POST['learningMethod'] == 'w'):
-                updateSession.consecutiveHighW = request.POST['consecutiveHigh']
+                if(int(request.POST['consecutiveHigh']) > updateSession.consecutiveHighW):
+                    updateSession.consecutiveHighW = request.POST['consecutiveHigh']
         except State.DoesNotExist:
             pass
 

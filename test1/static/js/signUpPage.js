@@ -1,4 +1,4 @@
-let feedBackMessageEmail =  document.getElementById('feedBack1');
+let feedBackMessageID =  document.getElementById('feedBack1');
 let feedBackMessagePassLength =  document.getElementById('feedBack2');
 let feedBackMessagePasssMatch =  document.getElementById('feedBack3');
 
@@ -14,7 +14,7 @@ let userCrentials = {
 }
 
 function setEmailTaken(){
-    feedBackMessageEmail.classList.remove('d-none')
+    feedBackMessageID.classList.remove('d-none')
     userID.classList.add('is-invalid')
 }
 
@@ -88,7 +88,7 @@ $(function() {
     })
 
     $('#userid').on('input', function() {
-        feedBackMessageEmail.classList.add('d-none')
+        feedBackMessageID.classList.add('d-none')
     })
 })
 

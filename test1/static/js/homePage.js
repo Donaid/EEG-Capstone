@@ -54,26 +54,26 @@ const music = document.getElementById('musicPlayer');
 const alert1 = document.getElementById('alert');
 let musicPlaying = false;
 
-music.addEventListener('ended',nextSong)
-let songNumber=0;
+let songNumber=1;
+music.addEventListener('ended',nextMusic)
 
-function playPauseSong(){
+function playPauseMusic(){
   if(musicPlaying){
-    document.getElementById('playPauseCh').classList.add('fa-play');
     document.getElementById('playPauseCh').classList.remove('fa-pause');
+    document.getElementById('playPauseCh').classList.add('fa-play');
     music.pause();
     musicPlaying=false;
   }
   else{
-    document.getElementById('playPauseCh').classList.add('fa-pause');
     document.getElementById('playPauseCh').classList.remove('fa-play');
+    document.getElementById('playPauseCh').classList.add('fa-pause');
     music.play();
     music.volume=0.5;
     musicPlaying=true;
   }
 }
 
-function nextSong(){
+function nextMusic(){
   if(songNumber==3){
     songNumber=1;
   }
@@ -86,7 +86,7 @@ function nextSong(){
   }
 }
 
-function prevSong(){
+function previousMusic(){
   if(songNumber==1){
     songNumber=3;
   }
@@ -110,7 +110,7 @@ const chData={
       label:'Attention Graph',
       data:[0,0,0,0,0,0],
       backgroundColor: [
-        'rgba(255, 100, 130, 0.5)',
+        'rgba(255, 100, 130, 0.2)',
       ],
       borderColor:[
         'rgba(240, 95, 125, 1)',

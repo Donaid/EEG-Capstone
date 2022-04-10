@@ -5,7 +5,7 @@ import json
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 
-class test2(AsyncJsonWebsocketConsumer):
+class WebsocketConnection(AsyncJsonWebsocketConsumer):
     
     async def connect(self):
         self.groupname = 'dashboard'

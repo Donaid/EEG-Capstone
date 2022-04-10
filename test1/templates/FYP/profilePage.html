@@ -13,13 +13,13 @@
   
   <!---Navigationbar-->
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark gradient shadow-lg">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-lg">
     <div class="container">
       <a class="navbar-brand" href="{% url 'homePage' %}">SADA</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nm">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="nm" >
+      <div class="collapse navbar-collapse" id="nm">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
             <a class="nav-link contr1 text-light" href="{% url 'homePage'%}" id="Home">Home</a>
@@ -34,7 +34,7 @@
   </nav>
 
   <!---Container for all the information-->
-  <div class="container mt-3 mb-5">
+  <div class="container my-4">
     <!--- first row for profile summary, learning method summary and pie chart graph --->
     <div class="row">
       <!---first column for profile summary-->
@@ -42,12 +42,12 @@
         <div class="border rounded shadow me-2 ms-2 h-100 addBorder1 addPadding1">
           <div class="card border-0 bg-transparent">
             <div class="card-body" style="text-align: center;">
-              <h5 class="card-title" >Profile Summary<hr></h5>
+              <h5 class="card-title">Profile Summary<hr></h5>
               <ul class="list-group list-group-flush">
-                <li class="list-group-item mb-2" id="userName" >Username :</li>
-                <li class="list-group-item mb-2" id="idealStudyTime" >Ideal Study Time:</li>
-                <li class="list-group-item mb-2" >Highest Consecutive Attention :</li>
-                <li class="list-group-item mb-3" >
+                <li class="list-group-item mb-2" id="userName">Username :</li>
+                <li class="list-group-item mb-2" id="idealStudyTime">Ideal Study Time:</li>
+                <li class="list-group-item mb-2">Highest Consecutive Attention :</li>
+                <li class="list-group-item mb-3 mt-2">
                   <ul class="list-group list-group-flush">
                     <li class="list-group-item mb-2 text-danger" id="consecutiveHighAttentionAV">Aural/Visual :</li>
                     <li class="list-group-item mb-2 text-primary" id="consecutiveHighAttentionRW">Read/Write :</li>
@@ -64,20 +64,20 @@
         <div class="me-2 ms-2 border border-end-0 rounded shadow h-100 addBorder1 addPadding1">
           <div class="card border-0 bg-transparent">
             <div class="card-body" style="text-align: center;">
-              <h5 class="card-title" >Learning Method Summary<hr></h5>
+              <h5 class="card-title">Learning Method Summary<hr></h5>
               <ul class="list-group list-group-flush">
-                <li class="list-group-item mb-2" >Sessions Completed :</li>
-                <li class="list-group-item mb-3" >
+                <li class="list-group-item mb-2">Sessions Completed :</li>
+                <li class="list-group-item mb-2 mt-2">
                   <ul class="list-group list-group-flush">
                     <li class="list-group-item mb-2 text-danger" id="sessionsCompletedAV">Aural/Visual :</li>
                     <li class="list-group-item mb-2 text-primary" id="sessionsCompletedRW">Read/Write :</li>
                   </ul>
                 </li>
-                <li class="list-group-item mb-2" >High to Total Attention Percentage :</li>
-                <li class="list-group-item mb-2" >
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item mb-2 text-primary" id="highToTotalAV">Aural/Visual :</li>
-                    <li class="list-group-item mb-2 text-danger" id="highToTotalRW">read/Write:</li>
+                <li class="list-group-item mb-2">High to Total Attention Percentage :</li>
+                <li class="list-group-item mb-2">
+                  <ul class="list-group list-group-flush mt-2">
+                    <li class="list-group-item mb-2 text-danger" id="highToTotalAV">Aural/Visual :</li>
+                    <li class="list-group-item mb-2 text-primary" id="highToTotalRW">read/Write:</li>
                   </ul>
                 </li>
               </ul>
@@ -103,7 +103,7 @@
           <h5 style="text-align: center;" class="mt-3">
           Attention Level Summary
           </h5>
-          <div class="ms-2">
+          <div class="ms-2 my-2">
             <img style="width: 30px;" src="https://img.icons8.com/material-outlined/24/fa314a/filled-circle--v1.png"/>
             Aural/Visual Learning
             <img style="width: 30px;" src="https://img.icons8.com/ios-filled/50/4a90e2/filled-circle.png"/>
@@ -111,10 +111,8 @@
           </div>
           <br>
           <div>
-            <div class="input-group mb-2 pe-2 ps-2">
-              <div class="input-group-prepend">
-                <span class="input-group-text">Enter Date for Summary</span>
-              </div>
+            <div class="input-group mb-3 pe-2 ps-2">
+              <span class="input-group-text">Enter Date for Summary</span>
               <input type="date" class="form-control" style="outline: none; box-shadow: none;" placeholder="Enter date in the formal dd-mm-yyyy" id="dateSelected1">
               <button class="btn-primary btn" onclick="changeData()">Submit</button>
             </div>
@@ -129,7 +127,7 @@
         <div class="me-2 ms-2 rounded border-0 shadow-lg addBorder2">
           <div class="card border-0 bg-transparent">
             <div class="card-body" style="text-align: center;">
-              <h5 class="card-title" >Daily Sessions<hr></h5>
+              <h5 class="card-title">Daily Sessions<hr></h5>
               <div class="d-flex justify-content-center" style="height: 300px;">
                 <div><canvas id="dailySessionsChart" class="bg-dark rounded"></canvas></div>
               </div>
@@ -142,7 +140,7 @@
         <div class="me-2 ms-2 rounded border-0 shadow-lg addBorder2 ">
           <div class="card border-0 bg-transparent">
             <div class="card-body" style="text-align: center;">
-              <h5 class="card-title" >Daily<hr></h5>
+              <h5 class="card-title">Daily<hr></h5>
               <div class="d-flex justify-content-center" style="height: 300px;">
                 <div><canvas id="dailyChart" class="bg-dark rounded"></canvas></div>
               </div>
@@ -155,7 +153,7 @@
         <div class="me-2 ms-2 rounded border-0 shadow-lg addBorder2">
           <div class="card border-0 bg-transparent">
             <div class="card-body" style="text-align: center;">
-              <h5 class="card-title" >Weekly<hr></h5>
+              <h5 class="card-title">Weekly<hr></h5>
               <div class="d-flex justify-content-center" style="height: 300px;"> 
                 <div><canvas id="weeklyChart" class="bg-dark rounded"></canvas></div>
               </div>
@@ -163,13 +161,13 @@
           </div>
         </div>
       </div>
-    </div>  
+    </div>
   </div>
   
   <!--Modal-->
   <div class="modal fade shadow-lg" tabindex="-1" id="errorModal">
     <div class="modal-dialog">
-      <div class="modal-content" style="border-radius:0.5rem; text-align: center;" >
+      <div class="modal-content" style="border-radius:0.5rem; text-align: center;">
         <div class="modal-header">
           <h5 class="modal-title" style="margin: auto;">Error</h5>
           <button type="button" class="btn-primary rounded border-0" onclick="closeErrorModal()">
@@ -203,11 +201,12 @@ var hLChart = new Chart(ch1,{
     ],
     datasets:[{
       label:'Total Attention High/Low',
-      data:[80,10],
+      data:[50,50],
       backgroundColor:[
         'rgb(0, 0, 255)',
         'rgb(255, 0, 0)'
-      ]
+      ],
+      hoverOffset:2
     }] 
   },
 });
@@ -278,7 +277,7 @@ var dSChart=new Chart(ch2,{
   data:{
     labels:[["session 1"], ["session 2"], ["session 3"], ["session 4"]],
     datasets:[{
-      data:[12, 19, 3, 5],
+      data:[0, 0, 0, 0],
       backgroundColor: [
           'rgba(255,0,0,0.5)',
           'rgba(0,0,255,0.5)',
@@ -316,7 +315,7 @@ var dChart = new Chart(ch3,{
   data:{
     labels:['High Attention', 'Low Attention','High Attention','Low Attention'],
     datasets:[{
-      data:[12, 19, 3, 5],
+      data:[0, 0, 0, 0],
       backgroundColor: [
         'rgba(255,0,0,0.5)',
         'rgba(255,0,0,0.5)',
@@ -351,7 +350,7 @@ var wChart = new Chart(ch4,{
   data:{
     labels:['High Attention', 'Low Attention','High Attention','Low Attention'],
     datasets:[{
-      data:[12, 19, 3, 5],
+      data:[0, 0, 0, 0],
       backgroundColor:[
         'rgba(255,0,0,0.5)',
         'rgba(255,0,0,0.5)',

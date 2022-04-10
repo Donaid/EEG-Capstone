@@ -122,7 +122,6 @@ if __name__ == "__main__":
     exportStatus(0)
     log.info("Exit")
     mwlsl.stop()
-    wsStatus.recv(1024)
     wsStatus.close()
     try:
       sys.exit(0)
