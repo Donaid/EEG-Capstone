@@ -4,13 +4,14 @@ import time
 import csv
 import threading
 import sys, os
+import websocket, json
 
 mwlsl = MindwaveLSL('localhost', 13854)
 
 mwlsl.setup()
 mwlsl.write('{"enableRawOutput": true, "format": "Json"}')
 
-RECORD_DURATION = 2
+RECORD_DURATION = 5
 FILE_PATH = "./demo_output/"
 remainingTime = 0
 sample = []
@@ -51,6 +52,12 @@ def exportStatus(currentStatus):
   filenameStatus = "status.txt"
   with open(filenameStatus, 'w', newline='') as filestatus:
     filestatus.write(writeStatus)
+  
+  try:
+    wsStatus.send(json.dumps({'Status': writeStatus}))
+  except ConnectionResetError:
+    wsStatus.connect('ws://localhost:8000/ws/test1')
+    wsStatus.send(json.dumps({'Status': writeStatus}))
 
 def main():
   global sample
@@ -108,11 +115,15 @@ def main():
 
 if __name__ == "__main__":
   try:
+    wsStatus = websocket.WebSocket()
+    wsStatus.connect('ws://localhost:8000/ws/test1')
     main()
   except KeyboardInterrupt:
     exportStatus(0)
     log.info("Exit")
     mwlsl.stop()
+    wsStatus.recv(1024)
+    wsStatus.close()
     try:
       sys.exit(0)
     except SystemExit:

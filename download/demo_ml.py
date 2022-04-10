@@ -112,7 +112,7 @@ def main():
   # ws = websocket.WebSocket()
   # ws.connect('ws://localhost:8000/ws/test1')
   ws.send(json.dumps({'Attention': result, 'Status':status}))
-  time.sleep(2.7)
+  time.sleep(5.7)
   
 
 

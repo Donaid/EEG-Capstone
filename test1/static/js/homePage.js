@@ -1,264 +1,238 @@
 var socket = new WebSocket('ws://localhost:8000/ws/test1')
+let deviceStatus = 0;
+let tempDjangoData;
 socket.onmessage = function(e) {
-  let tempDjangoData = JSON.parse(e.data);
-  if(isRecording) {
-    updateChart(tempDjangoData)
+  tempDjangoData = JSON.parse(e.data).data;
+  
+  if(tempDjangoData.hasOwnProperty('Status')) {
+    if(tempDjangoData.Status == "connected") {
+      deviceStatus = 1;
+      bluetoothIcon.src="https://img.icons8.com/material-rounded/96/000000/bluetooth.png";
+      if(!isRecording) {
+        unDisableStartButton();
+      }
+    }
+    else if(tempDjangoData.Status == "disconnected") {
+      deviceStatus = 0;
+      bluetoothIcon.src="https://img.icons8.com/material-rounded/96/000000/bluetooth-off.png";
+      if(isRecording) {
+        featureDecider();
+      }
+      disableStartButton();
+    }
+  }
+
+  if(isRecording && deviceStatus == 1) {
+    updaterAll(tempDjangoData)
     saveAttention(tempDjangoData)
   }
 
-  if(tempDjangoData.Status == "disconnected") {
-    bluetoothIcon.src="https://img.icons8.com/material-rounded/96/000000/bluetooth-off.png"
-  }
-  else if (tempDjangoData.Status == "connected") {
-    bluetoothIcon.src="https://img.icons8.com/material-rounded/96/000000/bluetooth.png"
-  }
+  // if(tempDjangoData.Status == "disconnected") {
+  //   bluetoothIcon.src="https://img.icons8.com/material-rounded/96/000000/bluetooth-off.png"
+  //   if(!isRecording){
+  //     disableStartButton()
+  //   }
+  //   if(isRecording){
+  //     showDisconnectModal()
+  //     featureDecider()
+  //   }
+    
+    
+  // }
+  // else if (tempDjangoData.Status == "connected") {
+  //   bluetoothIcon.src="https://img.icons8.com/material-rounded/96/000000/bluetooth.png"
+  //   if(!isRecording){
+  //     unDisableStartButton()
+  //   }
+  // }
 
 }
 
 //  --------------------------------  Music PLayer -----------------------------------------------
-
-const nextBtn = document.getElementById('nextButton');
-const prevBtn = document.getElementById('prevButton');
 const playPauseBtn = document.getElementById('playPauseButton');
 const music = document.getElementById('musicPlayer');
 const alert1 = document.getElementById('alert');
 let musicPlaying = false;
 
-
 music.addEventListener('ended',nextSong)
-
-const musicList = ['song1','song2','song3'];
 let songNumber=0;
 
 function playPauseSong(){
-  if (musicPlaying){
+  if(musicPlaying){
+    document.getElementById('playPauseCh').classList.add('fa-play');
+    document.getElementById('playPauseCh').classList.remove('fa-pause');
     music.pause();
-    playPauseBtn.getElementsByClassName('fas')[0].classList.add('fa-play');
-    playPauseBtn.getElementsByClassName('fas')[0].classList.remove('fa-pause');
     musicPlaying=false;
   }
   else{
+    document.getElementById('playPauseCh').classList.add('fa-pause');
+    document.getElementById('playPauseCh').classList.remove('fa-play');
     music.play();
-    playPauseBtn.getElementsByClassName('fas')[0].classList.add('fa-pause');
-    playPauseBtn.getElementsByClassName('fas')[0].classList.remove('fa-play');
-    music.volume=0.5
+    music.volume=0.5;
     musicPlaying=true;
-
   }
-
-
-
 }
 
 function nextSong(){
-  if(songNumber==2){
-    songNumber=0;
+  if(songNumber==3){
+    songNumber=1;
   }
   else{
-    songNumber++
+    songNumber++;
   }
-  music.src='/static/media/'+musicList[songNumber]+'.mp3'
-
+  music.src='/static/media/song'+songNumber+'.mp3'
   if(musicPlaying){
     music.play();
   }
-  
-
 }
 
 function prevSong(){
-  if(songNumber==0){
-    songNumber=2;
+  if(songNumber==1){
+    songNumber=3;
   }
   else{
-    songNumber--
+    songNumber--;
   }
-  music.src='/static/media/'+musicList[songNumber]+'.mp3';
-
+  music.src='/static/media/song'+songNumber+'.mp3';
   if(musicPlaying){
     music.play();
   }
-  
- 
 }
-
 
 //  -----------------------------------  Main Graph  -------------------------------------------------
 
-const ctx = document.getElementById('myChart').getContext('2d');
-const dataObj = {
-    type: 'line',
-    data: {
-        labels: ['10s','10s','10s','10s','10s','10s'],
-        datasets: [{
-            label: 'Attention Graph',
-            data: [0,0,0,0,0,0],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 2
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true,
-                max:100,
-                title: {
-                  display: true,
-                  text: 'Probability of High Attention %'
-                }
-            },
-            x: {
-              title: {
-                display: true,
-                text: 'Time - 10 seconds Interval'
-              }
-          },
+const ctx = document.getElementById('mainChart').getContext('2d');
+const chData={
+  type:'line',
+  data:{
+    labels:['10s','10s','10s','10s','10s','10s'],
+    datasets:[{
+      label:'Attention Graph',
+      data:[0,0,0,0,0,0],
+      backgroundColor: [
+        'rgba(255, 100, 130, 0.5)',
+      ],
+      borderColor:[
+        'rgba(240, 95, 125, 1)',
+        'rgba(48, 155, 230, 1)',
+        'rgba(248, 198, 80, 1)',
+        'rgba(68, 185, 180, 1)',
+        'rgba(140, 90, 240, 1)',
+        'rgba(240, 140, 50, 1)'
+      ],
+      borderWidth: 2
+    }]
+  },
+  options:{
+    scales:{
+      y:{
+        beginAtZero:true,
+        max:100,
+        title:{
+          display:true,
+          text:'Probability of High Attention %'
         }
-
+      },
+      x:{
+        title:{
+          display:true,
+          text:'Time - 10 seconds Interval'
+        }
+      },
     }
+  }
 }
-const myChart = new Chart(ctx, dataObj);
+const mainChart = new Chart(ctx, chData);
+
 //------------------------------------Updating Graph-------------------------------------------------
 
-
-const loginBtn = document.getElementById('login');
-const profileBtn = document.getElementById('profile');
 const readWriteBtn = document.getElementById('readWrite');
 const auralVisualBtn = document.getElementById('auralVisual');
-const recordingBtn = document.getElementById('record')
-var myModal = new bootstrap.Modal(document.getElementById("modal1"), {});
-var myModal2 = new bootstrap.Modal(document.getElementById("modal2"), {});
-const mUserName=document.getElementById('modalUserName')
-const mLearningMode=document.getElementById('modalLearningMode')
-const mSessionTime=document.getElementById('modalSessionTime')
-const mAttentionLevel=document.getElementById('modelAttentionLevel')
-const bluetoothIcon=document.getElementById('bluetoothIcon')
-const alertIcon=document.getElementById('alertIcon')
-
+const recordingBtn = document.getElementById('record');
+disableStartButton()
+let summaryModal = new bootstrap.Modal(document.getElementById("modal1"), {});
+let attentionModal = new bootstrap.Modal(document.getElementById("modal2"), {});
+let disconnectModal = new bootstrap.Modal(document.getElementById("modal3"), {});
+//const mUserName=document.getElementById('modalUserName');
+const mLearningMode=document.getElementById('modalLearningMode');
+const mSessionTime=document.getElementById('modalSessionTime');
+const mAttentionLevel=document.getElementById('modelAttentionLevel');
+const bluetoothIcon=document.getElementById('bluetoothIcon');
+const alertIcon=document.getElementById('alertIcon');
 let aIconPressed=true;
-
-
 let isRecording=false;
 let learningMode='Read/Write';
-let username='new user';        //import from back-end
-let date='';
+//let username='new user';  
+//let date='';
 let attentionValue=0;
 let counter=0;
 let totalAttentionTemp=0;
-let averageAttention=''
+let averageAttention='';
 // let timer1;
 let startTime=0;
 let endTime=0;
 let elapsedTime='';
 let dateCheck = new Date();
-let currentTime=0;
-let highestConsecutive=0;
-let highestConsecutiveTemp=0;
+let tempConsecutiveHighAttention = 0;
+let consecutiveHighAttention = 0;
+//let currentTime=0;
+//let highestConsecutive=0;
+//let highestConsecutiveTemp=0;
 let attentionValueSum=0;
 let attentionValueCounter=0;
 
-//this object will have all the data stored in this at the end of the session
-
+//this object will have all the data stored at end of the session
 let userData = {
-  // userName:'',
   learningType:'',
   sessionTime:0,
   attentionLevel:0,
-  date:'',
-  time:0,
-  highestConsecutiveTime:0
+  //date:'',
+  //time:0,
+  //highestConsecutiveTime:0,
+  // userName:''
 }
 
 function featureDecider(){
   if(isRecording){
-	  // clearInterval(timer1)
-
+	  
     endTime=Date.now();
-    
-
-    elapsedTime=(calculateElapsedTime(startTime,endTime))
-
+    elapsedTime=(calculateElapsedTime(startTime,endTime));
     recordingBtn.innerHTML='Start Recording';
-
-    unDisableButtons()
-
-    averageAttention=calculateAveAttention(totalAttentionTemp,counter)+'%'
-
+    unDisableButtons();
+    averageAttention=calculateAveAttention(totalAttentionTemp,counter)+'%';
     isRecording=false;
-    attentionValueCounter = 0;
-
+    updateLatestSession(consecutiveHighAttention, (learningMode=='Read/Write'? 'r':'w'));
     fillObject();
-
-    
-
-    //Send object to back end here
-
-    
-
     updateModal();
-
     showModal();
-
     resetData();
-
     clearGraph(); 
 
-    highestConsecutiveTime=0;
-    
-    music.volume=0.5
-
-    updateLatestSession()    
+    // clearInterval(timer1)
+    //highestConsecutiveTime=0;
     /* send object to back-end here*/
 	// socket.onclose = function (e) {
 	// 	console.log('The connection has been closed successfully.');
 	// };
 	// socket.onclose()
-
-
   }
+  
   else if(!isRecording){
-
     // timer1=setInterval(updateChart,1000);
-
-    currentTime=dateCheck.getHours();
-    
+    //currentTime=dateCheck.getHours();
     startTime=Date.now();//used to calculate elapsed time
-    
-
     recordingBtn.innerHTML='Stop Recording';
-
-    date=dateCheck.getFullYear()+'-'+(dateCheck.getMonth()+1)+'-'+dateCheck.getDate();
-
+    //date=dateCheck.getFullYear()+'-'+(dateCheck.getMonth()+1)+'-'+dateCheck.getDate();
     disableButtons();
-
     isRecording=true;
-
-
   }
 }
 
 function disableButtons(){
-
   const elementsChange = document.getElementsByClassName("contr1");
   for (let i = 0; i < elementsChange.length; i++) {
     elementsChange[i].classList.add('disabled');
 }
-
 }
 
 function unDisableButtons(){
@@ -266,179 +240,188 @@ function unDisableButtons(){
   for (let i = 0; i < elementsChange.length; i++) {
     elementsChange[i].classList.remove('disabled');
   }
-
 }
 
+function disableStartButton(){
+  recordingBtn.classList.add('disabled');
+}
 
+function unDisableStartButton(){
+  recordingBtn.classList.remove('disabled');
+}
 
-
-function updateChart(tempDjangoData){
+function updaterAll(tempDjangoData){
 	
-  previousValue=false;
   let djangoData = tempDjangoData;
-  
-  dataObj.data.datasets[0].data.shift();
-  dataObj.data.datasets[0].data.push(djangoData.Attention);
+  attentionValue=djangoData.Attention;
 
-  attentionValue=djangoData.Attention
-
-  if(attentionValue < 50) {
-    playAlert()
+  if(attentionValue >= 50) {
+    tempConsecutiveHighAttention++;
+    if (tempConsecutiveHighAttention > consecutiveHighAttention) {
+      consecutiveHighAttention = tempConsecutiveHighAttention;
+    }
+  }
+  else {
+    tempConsecutiveHighAttention = 0;
   }
 
+  updateChart();
+  alertOneM();
+  alerttenM();
+  manageMusicPlay();
+  
+  counter++;
+  totalAttentionTemp=totalAttentionTemp+attentionValue;
+}
+
+function updateChart(){
+  chData.data.datasets[0].data.shift();
+  chData.data.datasets[0].data.push(attentionValue);
+  mainChart.update();
+}
+  
+function alertOneM(){
   attentionValueSum=attentionValueSum+attentionValue;
   attentionValueCounter=attentionValueCounter+1;
-
-  if(attentionValueCounter==30){ //this will play alert every 60 seconds if average attention was low
-    if((attentionValueSum/30)<50){
-      attentionValueSum=0
+  if((attentionValueCounter%6)==0){
+    if((attentionValueSum/6)<50){
+      attentionValueSum=0;
+      playAlert();
     }
-    if((attentionValueSum/30)>=50){
-      attentionValueCounter=0
+    if((attentionValueSum/6)>=50){
+      attentionValueCounter=0;
+      attentionValueSum=0;
     }
-    
-    if(attentionValueCounter==300){ //this will display modal if attention was consecutively low for 10 minutes
-      myModal2.show()
-      playAlert()
-      attentionValueCounter=0
-    }
-
   }
+}  
+  
+function alerttenM(){
+  if(attentionValueCounter==60){
+    attentionModal.show();
+    playAlert();
+    attentionValueCounter=0;
+  }
+}
 
+function manageMusicPlay(){
   if(attentionValue>=50){
-    reduceVolume()
-    highestConsecutiveTemp=highestConsecutiveTemp+1;
+    if(musicPlaying){
+      if(music.volume>0.19){
+          music.volume=music.volume-0.1;
+      }
+    }
+    //highestConsecutiveTemp=highestConsecutiveTemp+1;
   }
   else if(attentionValue<50){
-    increaseVolume()
-    if(highestConsecutiveTemp>highestConsecutive){
-    highestConsecutive=highestConsecutiveTemp;
+    if(musicPlaying){
+      let tempVolume = music.volume + 0.1;
+      if(tempVolume > 1){
+        music.volume = 1;
+      }
+      else if(music.volume<1){
+        music.volume=music.volume+0.1;
+      }
     }
-    highestConsecutiveTemp=0;
+    //if(highestConsecutiveTemp>highestConsecutive){
+    //highestConsecutive=highestConsecutiveTemp;
+    //}
+    //highestConsecutiveTemp=0;
   }
-  
-  myChart.update();
-  counter++
-  totalAttentionTemp=totalAttentionTemp+attentionValue
-  
 }
   
-  
-  
-  
-  
-  
-  
-  
-  
- function calculateAveAttention(attention,number){
-  return(Math.round(attention/number))
- } 
+function calculateAveAttention(attention,number){
+  return(Math.round(attention/number));
+} 
 
 function calculateElapsedTime(startT,endT){
-  let actualTime=endT-startT
-  actualTime=Math.floor(actualTime/1000);
-  var minutes = Math.floor(actualTime/ 60);
-  var seconds = (actualTime % 60)
-  return(minutes + ":" + seconds);
+  let actualTime=Math.floor((endT-startT)/1000);
+  let m=Math.floor(actualTime/ 60);
+  let s=(actualTime % 60);
+  return(m+":"+s);
 }
-
 
 function showModal () {
-  myModal.show();
-
+  summaryModal.show();
 }
-  
 
 function fillObject(){
-  // userData.userName=username;
   userData.learningType=learningMode;
-  userData.sessionTime=elapsedTime
-  userData.attentionLevel=averageAttention
-  userData.date=date
-  userData.time=currentTime;
-  userData.highestConsecutiveTime=highestConsecutive;
-  }
-
+  userData.sessionTime=elapsedTime;
+  userData.attentionLevel=averageAttention;
+  //userData.date=date;
+  //userData.time=currentTime;
+  //userData.highestConsecutiveTime=highestConsecutive;
+  // userData.userName=username;
+}
 
 function updateModal(){
   // mUserName.innerHTML='Username : ' + userData.userName;
   mLearningMode.innerHTML='Learning Mode : ' + userData.learningType;
-  mSessionTime.innerHTML='Session Time : ' + userData.sessionTime
+  mSessionTime.innerHTML='Session Time : ' + userData.sessionTime;
   mAttentionLevel.innerHTML='Avg Attention Level : ' + userData.attentionLevel;
 }  
 
 function clearGraph(){
-  myChart.data.datasets[0].data=[0,0,0,0,0,0]
-  myChart.update()
-  }
+  mainChart.data.datasets[0].data=[0,0,0,0,0,0];
+  mainChart.update();
+}
 
 function resetData(){
   counter=0;
   totalAttentionTemp=0;
+  attentionValueCounter = 0;
+  attentionValueSum = 0;
+  music.volume=0.5;
+  tempConsecutiveHighAttention = 0;
+  consecutiveHighAttention = 0;
 }
 
-
 function learningModeReadWrite(){
-    learningMode='Read/Write'
-    readWriteBtn.classList.add('learningModeActiveButton')
-    auralVisualBtn.classList.remove('learningModeActiveButton')
-
-  }
+  learningMode='Read/Write';
+  readWriteBtn.classList.add('learningModeActiveButton');
+  auralVisualBtn.classList.remove('learningModeActiveButton');
+}
   
-  function learningModeAuralVisual(){
-    learningMode='Aural/Visual'
-    readWriteBtn.classList.remove('learningModeActiveButton')
-    auralVisualBtn.classList.add('learningModeActiveButton')
+function learningModeAuralVisual(){
+  learningMode='Aural/Visual';
+  readWriteBtn.classList.remove('learningModeActiveButton');
+  auralVisualBtn.classList.add('learningModeActiveButton');
+}
+
+function closeModal(){
+  summaryModal.hide();
+}
+
+function playAlert(){
+  alert1.play();
+}
+
+function changeAlertIcon(){
+  if(aIconPressed){
+    alert1.volume=0;
+    alertIcon.src="https://img.icons8.com/external-kmg-design-glyph-kmg-design/64/000000/external-silent-calendar-date-kmg-design-glyph-kmg-design.png";
+    aIconPressed=false;
   }
 
-  function closeModal(){
-    myModal.hide()
+  else{
+    alert1.volume=1;
+    alertIcon.src="https://img.icons8.com/material-rounded/96/000000/bell--v1.png";
+    aIconPressed=true;
   }
+}
 
-  function reduceVolume(){
-    if(musicPlaying){
-      if(music.volume>=0.1){
-        music.volume=music.volume-0.1
-      }
-    }
-  }
+function closeModal2(){
+  attentionModal.hide();
+}
 
-  function increaseVolume(){
-    if(musicPlaying){
-      let tempVolume = music.volume + 0.1
-      if(tempVolume > 1) {
-        music.volume = 1
-      }
-      else if(music.volume<1){
-        music.volume=music.volume+0.1
-      }
-    }
-  }
+function closeModal3(){
+  disconnectModal.hide();
+}
 
-
-  function playAlert(){
-    alert1.play()
-  }
-
-
-  function changeAlertIcon(){
-    if(aIconPressed){
-      alert1.volume=0
-      alertIcon.src="https://img.icons8.com/external-kmg-design-glyph-kmg-design/64/000000/external-silent-calendar-date-kmg-design-glyph-kmg-design.png"
-      aIconPressed=false;
-    }
-    else{
-      alert1.volume=1
-      alertIcon.src="https://img.icons8.com/material-rounded/96/000000/bell--v1.png"
-      aIconPressed=true;
-    }
-
-  }
-
-  function closeModal2(){
-    myModal2.hide()
-  }
+function showDisconnectModal(){
+  disconnectModal.show();
+  setTimeout(closeModal3,1000);
+}
 
   function getCookie(name) {
     let cookieValue = null;
@@ -446,7 +429,6 @@ function learningModeReadWrite(){
         const cookies = document.cookie.split(';');
         for (let i = 0; i < cookies.length; i++) {
             const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
             if (cookie.substring(0, name.length + 1) === (name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                 break;
@@ -478,7 +460,7 @@ function learningModeReadWrite(){
     })
   }
 
-  function updateLatestSession(){
+  function updateLatestSession(consecutiveHigh, learningMethod) {
     $.ajax(
     {
       type:"POST",
@@ -486,6 +468,10 @@ function learningModeReadWrite(){
       mode: 'same-origin',
       headers: {
         "X-CSRFToken" : getCookie('csrftoken')
+      },
+      data: {
+        consecutiveHigh: consecutiveHigh,
+        learningMethod: learningMethod
       },
       success: function(data) 
         {
