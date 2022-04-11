@@ -133,7 +133,6 @@ const recordingBtn = document.getElementById('record');
 disableStartButton()
 let summaryModal = new bootstrap.Modal(document.getElementById("modal1"), {});
 let attentionModal = new bootstrap.Modal(document.getElementById("modal2"), {});
-let disconnectModal = new bootstrap.Modal(document.getElementById("modal3"), {});
 const mLearningMode=document.getElementById('modalLearningMode');
 const mSessionTime=document.getElementById('modalSessionTime');
 const mAttentionLevel=document.getElementById('modelAttentionLevel');
@@ -364,68 +363,59 @@ function closeModal2(){
   attentionModal.hide();
 }
 
-function closeModal3(){
-  disconnectModal.hide();
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+          }
+      }
+  }
+  return cookieValue;
 }
 
-function showDisconnectModal(){
-  disconnectModal.show();
-  setTimeout(closeModal3,1000);
+function saveAttention(tempDjangoSaveData){
+  $.ajax(
+  {
+    type:"POST",
+    url: "/test1/saveattention/",
+    mode: 'same-origin',
+    headers: {
+      "X-CSRFToken" : getCookie('csrftoken')
+    },
+    data: {
+      attention: tempDjangoSaveData.Attention.toFixed(2),
+      status: tempDjangoSaveData.Status,
+      learningMethod: (learningMode=='Read/Write'? 'r':'w')
+
+    },
+    success: function(data) 
+      {
+        console.log("save success", data)
+      }
+  })
 }
 
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-  }
-
-  function saveAttention(tempDjangoSaveData){
-    $.ajax(
-    {
-      type:"POST",
-      url: "/test1/saveattention/",
-      mode: 'same-origin',
-      headers: {
-        "X-CSRFToken" : getCookie('csrftoken')
-      },
-      data: {
-        attention: tempDjangoSaveData.Attention.toFixed(2),
-        status: tempDjangoSaveData.Status,
-        learningMethod: (learningMode=='Read/Write'? 'r':'w')
-
-      },
-      success: function(data) 
-        {
-          console.log("save success", data)
-        }
-    })
-  }
-
-  function updateLatestSession(consecutiveHigh, learningMethod) {
-    $.ajax(
-    {
-      type:"POST",
-      url: "/test1/updatelatestsession/",
-      mode: 'same-origin',
-      headers: {
-        "X-CSRFToken" : getCookie('csrftoken')
-      },
-      data: {
-        consecutiveHigh: consecutiveHigh,
-        learningMethod: learningMethod
-      },
-      success: function(data) 
-        {
-          console.log("update success", data)
-        }
-    })
-  }
+function updateLatestSession(consecutiveHigh, learningMethod) {
+  $.ajax(
+  {
+    type:"POST",
+    url: "/test1/updatelatestsession/",
+    mode: 'same-origin',
+    headers: {
+      "X-CSRFToken" : getCookie('csrftoken')
+    },
+    data: {
+      consecutiveHigh: consecutiveHigh,
+      learningMethod: learningMethod
+    },
+    success: function(data) 
+      {
+        console.log("update success", data)
+      }
+  })
+}

@@ -257,7 +257,7 @@ def signInPage(request):
 def signUpPage(request):
     idStatus = 'd-none'
     if request.method == 'POST':
-        if request.POST['userpw1'] == request.POST['userpw2'] and len(request.POST['userpw1'])>=8 and len(request.POST['userpw1'])<=16:
+        if (request.POST['userpw1'] == request.POST['userpw2']) and len(request.POST['userpw1'])>=8 and len(request.POST['userpw1'])<=16:
             username = request.POST['userid']
             password = request.POST['userpw1']
             

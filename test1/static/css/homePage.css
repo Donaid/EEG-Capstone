@@ -1,15 +1,15 @@
 .btn-style {
-  font-size:20px;
-  color:rgb(100, 100, 100);
+  font-size: 20px;
+  color: rgb(100, 100, 100);
 }
 
 .learningModeActiveButton{
-  border-color:rgb(0, 0, 0);
-  border-width:2px;
+  border-color: rgb(0, 0, 0);
+  border-width: 2px;
 }
 
-@media (max-width:768px){
+@media (max-width: 768px){
   .adjust{
-    text-align:center;
+    text-align: center;
   }
 }
