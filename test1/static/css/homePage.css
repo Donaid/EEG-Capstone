@@ -8,8 +8,8 @@
   border-width:2px;
 }
 
-  @media (max-width:768px){
-.adjust{
-  text-align:center;
-}
+@media (max-width:768px){
+  .adjust{
+    text-align:center;
+  }
 }

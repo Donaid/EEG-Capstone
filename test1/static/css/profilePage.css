@@ -1,25 +1,23 @@
 @media (max-width: 575px){
-    .addBorder1{
-      border: 1px solid rgb(187, 187, 187) !important; 
-
-      }
-    }
+  .addBorder1{
+    border: 1px solid rgb(187, 187, 187) !important; 
+  }
+}
 
 @media (max-width: 992px){
-    .addBorder2{
-      border: 1px solid rgb(187, 187, 187) !important; 
-
-      }
-    }
+  .addBorder2{
+    border: 1px solid rgb(187, 187, 187) !important; 
+  }
+}
 
 @media (max-width:575px){
-    .addP1{
-      padding-bottom: 10px !important;
-    }
+  .addP1{
+    padding-bottom: 10px !important;
+  }
 }
 
 @media (max-width:768px){
-    .addP2{
-      padding-bottom: 10px !important;
-    }
+  .addP2{
+    padding-bottom: 10px !important;
+  }
 }
