@@ -206,7 +206,7 @@ var hLChart = new Chart(ch1,{
         'rgb(0, 0, 255)',
         'rgb(255, 0, 0)'
       ],
-      hoverOffset:2
+      hoverOffset:4
     }] 
   },
 });
@@ -222,32 +222,8 @@ const sessionsCompletedRW=document.getElementById('sessionsCompletedRW');
 const highToTotalAV=document.getElementById('highToTotalAV');
 const highToTotalRW=document.getElementById('highToTotalRW');
 
-// var person2 = JSON.parse("{{ personJson|escapejs }}");
-
-// value1 = person2['userName'];
-// value2 = parseInt(person2['idealStudyTime']);
-// value3 = parseInt(person2['audioVideoHighAttention']);
-// value4 = parseInt(person2['readWriteHighAttention']);
-// value5 = parseInt(person2['sessionsCompletedAV']);
-// value6 = parseInt(person2['sessionsCompletedRW']);
-// value7 = parseInt(person2['highToTotalAV']);
-// value8 = parseInt(person2['highToTotalRW']);
-// value9 = parseInt(person2['graphHighAttention']);
-// value10 = parseInt(person2['graphLowAttention']);
 
 //Object that contains all the data
-// let userData={
-//   userName:person2.userName,
-//   idealStudyTime:"12:00 PM",
-//   audioVideoHighAttention:30,
-//   readWriteHighAttention:43,
-//   sessionsCompletedAV:person2.sessionsCompletedAV,
-//   sessionsCompletedRW:person2.sessionsCompletedRW,
-//   highToTotalAV:person2.highToTotalAV,
-//   highToTotalRW:person2.highToTotalRW,
-//   graphHighAttention:person2.graphHighAttention,
-//   graphLowAttention:person2.graphLowAttention
-// }
 let userData = {}
 
 //function for updating piechart
@@ -380,23 +356,8 @@ var wChart = new Chart(ch4,{
 
 const date1=document.getElementById('dateSelected1');
 let errorModal = new bootstrap.Modal(document.getElementById("errorModal"), {});
-// date1.value = person2.date
-
-// let graphData1={
-//   learningMode:['r','w','r','r'],
-//   dailySessionData:[76,41,89,17],//the attention values for daily sessions
-//   daily:[70,30,80,20],//the attention values for the overall day
-//   weekly:[15,85,28,72]//the attention values for the overall week
-// }
 
 //object that contains data for bottom three graphs
-// let graphData1={
-//   learningMode: person2.learningMode,
-//   dailySessionData: person2.dailySessionData,//the attention values for daily sessions
-//   daily: person2.daily,//the attention values for the overall day
-//   weekly:[15,85,28,72]//the attention values for the overall week
-// }
-
 let graphData1 = {}
 
 //function that fills daily sessions graph
@@ -459,7 +420,6 @@ function timer1(){
       "X-CSRFToken" : getCookie('csrftoken')
     },
     success: function(data) {
-      console.log('onload data', data);
       userData = {
         userName: data.userName,
         idealStudyTime: data.idealStudyTime,
@@ -485,9 +445,6 @@ function timer1(){
       updateAll();
     }
   })
-  // setTimeout(updateChart,1000)
-  // setTimeout(updateData,1000)
-  // setTimeout(updateAll,1000)
 }
 
 function getCookie(name) {
@@ -512,7 +469,6 @@ function changeData(){//this function is for when the user selects Date
   {
     type:"POST",
     url: "/test1/updateprofiledata/",
-    // url: "/test1/getprofiledata/",
     mode: 'same-origin',
     headers: {
       "X-CSRFToken" : getCookie('csrftoken')
@@ -521,16 +477,8 @@ function changeData(){//this function is for when the user selects Date
       targetDate : date1.value
     },
     success: function(data) {
-      console.log("filter", data);
       if(data.dataAvailable == 1){
         //update this object with new date
-        // graphData1={
-        //   learningMode:['r','w','r','w'],
-        //   dailySessionData:[10,10,10,10],//the attention values for daily sessions
-        //   daily:[10,10,10,10],//the attention values for the overall day
-        //   weekly:[10,10,10,10]//the attention values for the overall week
-
-        // }
         graphData1.learningMode = data.learningMode;
         graphData1.dailySessionData = data.dailySessionData;
         graphData1.daily = data.daily;
@@ -543,10 +491,6 @@ function changeData(){//this function is for when the user selects Date
       }
     }
   })
-  // dateFound = true;
-  // date1.value
-
-
 
 }
 

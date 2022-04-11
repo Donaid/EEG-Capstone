@@ -27,25 +27,6 @@ socket.onmessage = function(e) {
     saveAttention(tempDjangoData)
   }
 
-  // if(tempDjangoData.Status == "disconnected") {
-  //   bluetoothIcon.src="https://img.icons8.com/material-rounded/96/000000/bluetooth-off.png"
-  //   if(!isRecording){
-  //     disableStartButton()
-  //   }
-  //   if(isRecording){
-  //     showDisconnectModal()
-  //     featureDecider()
-  //   }
-    
-    
-  // }
-  // else if (tempDjangoData.Status == "connected") {
-  //   bluetoothIcon.src="https://img.icons8.com/material-rounded/96/000000/bluetooth.png"
-  //   if(!isRecording){
-  //     unDisableStartButton()
-  //   }
-  // }
-
 }
 
 //  --------------------------------  Music PLayer -----------------------------------------------
@@ -153,7 +134,6 @@ disableStartButton()
 let summaryModal = new bootstrap.Modal(document.getElementById("modal1"), {});
 let attentionModal = new bootstrap.Modal(document.getElementById("modal2"), {});
 let disconnectModal = new bootstrap.Modal(document.getElementById("modal3"), {});
-//const mUserName=document.getElementById('modalUserName');
 const mLearningMode=document.getElementById('modalLearningMode');
 const mSessionTime=document.getElementById('modalSessionTime');
 const mAttentionLevel=document.getElementById('modelAttentionLevel');
@@ -162,22 +142,16 @@ const alertIcon=document.getElementById('alertIcon');
 let aIconPressed=true;
 let isRecording=false;
 let learningMode='Read/Write';
-//let username='new user';  
-//let date='';
 let attentionValue=0;
 let counter=0;
 let totalAttentionTemp=0;
 let averageAttention='';
-// let timer1;
 let startTime=0;
 let endTime=0;
 let elapsedTime='';
 let dateCheck = new Date();
 let tempConsecutiveHighAttention = 0;
 let consecutiveHighAttention = 0;
-//let currentTime=0;
-//let highestConsecutive=0;
-//let highestConsecutiveTemp=0;
 let attentionValueSum=0;
 let attentionValueCounter=0;
 
@@ -186,10 +160,6 @@ let userData = {
   learningType:'',
   sessionTime:0,
   attentionLevel:0,
-  //date:'',
-  //time:0,
-  //highestConsecutiveTime:0,
-  // userName:''
 }
 
 function featureDecider(){
@@ -208,21 +178,11 @@ function featureDecider(){
     resetData();
     clearGraph(); 
 
-    // clearInterval(timer1)
-    //highestConsecutiveTime=0;
-    /* send object to back-end here*/
-	// socket.onclose = function (e) {
-	// 	console.log('The connection has been closed successfully.');
-	// };
-	// socket.onclose()
   }
   
   else if(!isRecording){
-    // timer1=setInterval(updateChart,1000);
-    //currentTime=dateCheck.getHours();
     startTime=Date.now();//used to calculate elapsed time
     recordingBtn.innerHTML='Stop Recording';
-    //date=dateCheck.getFullYear()+'-'+(dateCheck.getMonth()+1)+'-'+dateCheck.getDate();
     disableButtons();
     isRecording=true;
   }
@@ -310,7 +270,6 @@ function manageMusicPlay(){
           music.volume=music.volume-0.1;
       }
     }
-    //highestConsecutiveTemp=highestConsecutiveTemp+1;
   }
   else if(attentionValue<50){
     if(musicPlaying){
@@ -322,10 +281,6 @@ function manageMusicPlay(){
         music.volume=music.volume+0.1;
       }
     }
-    //if(highestConsecutiveTemp>highestConsecutive){
-    //highestConsecutive=highestConsecutiveTemp;
-    //}
-    //highestConsecutiveTemp=0;
   }
 }
   
@@ -348,14 +303,9 @@ function fillObject(){
   userData.learningType=learningMode;
   userData.sessionTime=elapsedTime;
   userData.attentionLevel=averageAttention;
-  //userData.date=date;
-  //userData.time=currentTime;
-  //userData.highestConsecutiveTime=highestConsecutive;
-  // userData.userName=username;
 }
 
 function updateModal(){
-  // mUserName.innerHTML='Username : ' + userData.userName;
   mLearningMode.innerHTML='Learning Mode : ' + userData.learningType;
   mSessionTime.innerHTML='Session Time : ' + userData.sessionTime;
   mAttentionLevel.innerHTML='Avg Attention Level : ' + userData.attentionLevel;

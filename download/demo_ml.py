@@ -117,7 +117,7 @@ def main():
   except ConnectionResetError:
     ws.connect('ws://localhost:8000/ws/test1')
     ws.send(json.dumps({'Attention': result, 'Status':status}))
-  time.sleep(5.7)
+  time.sleep(10.7)
   
 
 

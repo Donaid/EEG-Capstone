@@ -97,7 +97,6 @@ def getProfileIdealTime(user):
             targetTimeState = State.objects.filter(user=user, time__range=(start_time, end_time))
             if len(targetTimeState) != 0:
                 averageAttention = round(targetTimeState.aggregate(Avg('attention'))['attention__avg'], 2)
-                print(f"average {hour} {averageAttention}")
                 if(averageAttention > 0):
                     if(averageAttention > highestAttention):
                         highestAttention = averageAttention
@@ -141,7 +140,6 @@ def getProfileSummary(user):
         except State.DoesNotExist:
             pass
         
-    print(profileSummary['highToTotalRW'])
     profileSummary['graphLowAttention'] = profileSummary['sessionsCompletedAV'] + profileSummary['sessionsCompletedRW'] - profileSummary['graphHighAttention']
     if(profileSummary['sessionsCompletedRW'] > 0):
         profileSummary['highToTotalRW'] = round((profileSummary['highToTotalRW'] * 100) / profileSummary['sessionsCompletedRW'], 2)
